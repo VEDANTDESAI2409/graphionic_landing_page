@@ -3,6 +3,9 @@ import { Play, ArrowUpRight, Star } from 'lucide-react';
 import Sky from './Sky';
 import { useInquiry, scrollToId } from '../context/Inquiry';
 import ServiceFan from './ServiceFan';
+import Aurora from './react-bits/Aurora';
+import Magnet from './react-bits/Magnet';
+import ShinyText from './react-bits/ShinyText';
 import { gsap, SplitText, isReducedMotion, isTouchDevice } from '../utils/gsapConfig';
 
 export default function Hero() {
@@ -129,6 +132,7 @@ export default function Hero() {
   return (
     <section className="hero" id="top" ref={heroRef}>
       <Sky />
+      <Aurora colorStops={['#007AFF', '#00A3FF', '#7CD400']} speed={0.65} />
       <div className="hero-glow" />
       <div className="hero-vignette" />
 
@@ -165,7 +169,7 @@ export default function Hero() {
             <div>
               <span className="hero-eyebrow">
                 <i className="hero-eyebrow-dot" aria-hidden="true" />
-                Full-Stack Product Studio
+                <ShinyText speed={4}>Full-Stack Product Studio</ShinyText>
               </span>
             </div>
 
@@ -182,18 +186,22 @@ export default function Hero() {
             </p>
 
             <div className="hero-ctas">
-              <button className="btn btn-lime" onClick={openInquiry}>
-                Get Started
-                <span className="ico">
-                  <ArrowUpRight size={17} strokeWidth={2.6} />
-                </span>
-              </button>
-              <button className="btn btn-glass" onClick={() => scrollToId('projects')}>
-                View Work
-                <span className="ico">
-                  <Play size={13} fill="currentColor" strokeWidth={0} />
-                </span>
-              </button>
+              <Magnet magnetStrength={0.25} padding={40}>
+                <button className="btn btn-lime" onClick={openInquiry}>
+                  Get Started
+                  <span className="ico">
+                    <ArrowUpRight size={17} strokeWidth={2.6} />
+                  </span>
+                </button>
+              </Magnet>
+              <Magnet magnetStrength={0.2} padding={30}>
+                <button className="btn btn-glass" onClick={() => scrollToId('projects')}>
+                  View Work
+                  <span className="ico">
+                    <Play size={13} fill="currentColor" strokeWidth={0} />
+                  </span>
+                </button>
+              </Magnet>
             </div>
 
             {/* trust signal, lifted into the first fold */}

@@ -1,5 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { Globe } from 'lucide-react';
+import ScrollRevealWords from './react-bits/ScrollRevealWords';
+import Magnet from './react-bits/Magnet';
 import { gsap, SplitText, isReducedMotion } from '../utils/gsapConfig';
 
 export default function About() {
@@ -98,22 +100,26 @@ export default function About() {
         </h2>
 
         <p>
-          We combine strategy, design, and technology to create high-performing
-          digital products that help businesses grow, automate, and stay ahead
-          in a rapidly changing world.
+          <ScrollRevealWords>
+            We combine strategy, design, and technology to create high-performing
+            digital products that help businesses grow, automate, and stay ahead
+            in a rapidly changing world.
+          </ScrollRevealWords>
         </p>
 
         {/* Global Presence — compact badge, sits between the description
             and the statistics cards. */}
-        <div className="globe-badge">
-          <span className="globe-badge-ico" aria-hidden="true">
-            <Globe size={20} strokeWidth={2.1} />
-          </span>
-          <span className="globe-badge-copy">
-            <strong>USA · UK · AU · UAE</strong>
-            <em>Global Presence</em>
-          </span>
-        </div>
+        <Magnet magnetStrength={0.2} padding={25}>
+          <div className="globe-badge">
+            <span className="globe-badge-ico" aria-hidden="true">
+              <Globe size={20} strokeWidth={2.1} />
+            </span>
+            <span className="globe-badge-copy">
+              <strong>USA · UK · AU · UAE</strong>
+              <em>Global Presence</em>
+            </span>
+          </div>
+        </Magnet>
       </div>
     </section>
   );

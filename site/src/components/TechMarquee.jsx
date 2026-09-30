@@ -1,4 +1,5 @@
-import { useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { gsap, isReducedMotion } from '../utils/gsapConfig';
 
 /* Minimal inline brand marks — small, subtle, no giant logos. */
@@ -52,12 +53,54 @@ const Flutter = () => (
 );
 
 const TECH = [
-  { name: 'React', Mark: React_ },
-  { name: 'Next.js', Mark: Next },
-  { name: 'Node.js', Mark: Node },
-  { name: 'Laravel', Mark: Laravel },
-  { name: 'Python', Mark: Python },
-  { name: 'Flutter', Mark: Flutter },
+  {
+    name: 'React',
+    category: 'Frontend',
+    role: 'Interactive Web Applications',
+    desc: 'High-speed reactive client interfaces, design systems, and responsive single-page web applications with fluid 60fps micro-animations.',
+    caps: ['Component Architecture', 'Framer Motion', 'State Management', 'Sub-second Load'],
+    Mark: React_,
+  },
+  {
+    name: 'Next.js',
+    category: 'Full-Stack',
+    role: 'Server-Side Rendered Platforms',
+    desc: 'Modern production SaaS platforms, server actions, and search-engine optimized web portals engineered for global scalability.',
+    caps: ['Server Components', 'Edge Caching', 'ISR & SEO', 'Enterprise Security'],
+    Mark: Next,
+  },
+  {
+    name: 'Node.js',
+    category: 'Backend',
+    role: 'Scalable Microservices & APIs',
+    desc: 'High-concurrency backend services, asynchronous queues, and real-time streaming architectures with robust fault tolerance.',
+    caps: ['REST & GraphQL', 'Event-Driven Systems', 'High Concurrency', 'Low Latency'],
+    Mark: Node,
+  },
+  {
+    name: 'Python',
+    category: 'AI & Data',
+    role: 'Autonomous AI & Workflow Automation',
+    desc: 'Custom LLM agents, intelligent business automation pipelines, document processing, and background worker systems.',
+    caps: ['AI Agents & Tooling', 'Workflow Automation', 'FastAPI Services', 'Data Extraction'],
+    Mark: Python,
+  },
+  {
+    name: 'Flutter',
+    category: 'Mobile',
+    role: 'Native Cross-Platform Apps',
+    desc: 'iOS and Android applications compiled from a single performant codebase with smooth native gestures and offline support.',
+    caps: ['iOS & Android Native', 'Offline-First Sync', '120Hz Animation', 'Hardware Access'],
+    Mark: Flutter,
+  },
+  {
+    name: 'Laravel',
+    category: 'Web Services',
+    role: 'Enterprise Portals & Backends',
+    desc: 'Structured relational backends, automated payment pipelines, and custom administrative control dashboards.',
+    caps: ['Relational Data Models', 'Payment Gateways', 'Queue Workers', 'Enterprise Auth'],
+    Mark: Laravel,
+  },
 ];
 
 function Row() {
@@ -77,6 +120,7 @@ function Row() {
 }
 
 export default function TechMarquee() {
+  const [selectedTech, setSelectedTech] = useState(TECH[0]);
   const sectionRef = useRef(null);
 
   useEffect(() => {
@@ -113,6 +157,61 @@ export default function TechMarquee() {
       <div className="marquee">
         <Row />
         <Row />
+      </div>
+
+      {/* Interactive Technology Ecosystem Explorer */}
+      <div className="tech-eco">
+        <div className="tech-nodes-grid" role="tablist" aria-label="Technology ecosystem selection">
+          {TECH.map((t) => {
+            const isCurrent = selectedTech.name === t.name;
+            const Mark = t.Mark;
+            return (
+              <button
+                key={t.name}
+                type="button"
+                role="tab"
+                aria-selected={isCurrent}
+                className={`tech-node-btn${isCurrent ? ' is-active' : ''}`}
+                onClick={() => setSelectedTech(t)}
+                onMouseEnter={() => setSelectedTech(t)}
+              >
+                <Mark />
+                <span>{t.name}</span>
+                <span className="tech-node-badge">{t.category}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <AnimatePresence mode="wait">
+          {selectedTech && (
+            <motion.div
+              key={selectedTech.name}
+              className="tech-detail-card"
+              initial={{ opacity: 0, y: 10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="tech-detail-icon" aria-hidden="true">
+                <selectedTech.Mark />
+              </div>
+              <div className="tech-detail-content">
+                <h4>
+                  {selectedTech.name} &mdash; <span>{selectedTech.role}</span>
+                </h4>
+                <p>{selectedTech.desc}</p>
+                <div className="tech-caps-row">
+                  {selectedTech.caps.map((cap) => (
+                    <span key={cap} className="tech-cap-pill">
+                      {cap}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </section>
   );

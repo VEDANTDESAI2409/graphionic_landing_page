@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 import { Mail, Phone, MapPin, ArrowUpRight } from 'lucide-react';
 import { COMPANY } from '../data/site';
 import { useInquiry, scrollToId } from '../context/Inquiry';
+import Magnet from './react-bits/Magnet';
 import { gsap, isReducedMotion } from '../utils/gsapConfig';
 
 const NAV = [
@@ -81,9 +82,11 @@ export default function Footer() {
               A global engineering partner building smarter, adaptive digital
               solutions — web, mobile, and intelligent automation.
             </p>
-            <button className="btn btn-lime foot-cta" onClick={openInquiry}>
-              Start Your Project <span className="ico"><ArrowUpRight size={16} strokeWidth={2.6} /></span>
-            </button>
+            <Magnet magnetStrength={0.2} padding={25}>
+              <button className="btn btn-lime foot-cta" onClick={openInquiry}>
+                Start Your Project <span className="ico"><ArrowUpRight size={16} strokeWidth={2.6} /></span>
+              </button>
+            </Magnet>
           </div>
 
           {/* nav */}

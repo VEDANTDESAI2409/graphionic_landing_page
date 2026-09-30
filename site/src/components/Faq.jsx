@@ -4,6 +4,7 @@ import { ChevronDown, MessageSquare, ArrowUpRight, Zap, ShieldCheck, Users, Glob
 import { FAQS } from '../data/site';
 import { useInquiry } from '../context/Inquiry';
 import useIsMobile from '../hooks/useIsMobile';
+import Magnet from './react-bits/Magnet';
 import { gsap, SplitText, isReducedMotion } from '../utils/gsapConfig';
 
 const ease = [0.16, 1, 0.3, 1];
@@ -188,9 +189,11 @@ export default function Faq() {
               <span className="faq-talk-ico"><MessageSquare size={22} strokeWidth={2.2} /></span>
               <h3>Let's Talk</h3>
               <p>Still have a question?<br />We're here to help.</p>
-              <button className="btn btn-lime faq-talk-btn" onClick={openInquiry}>
-                Contact Us <span className="ico"><ArrowUpRight size={17} strokeWidth={2.6} /></span>
-              </button>
+              <Magnet magnetStrength={0.2} padding={25}>
+                <button className="btn btn-lime faq-talk-btn" onClick={openInquiry}>
+                  Contact Us <span className="ico"><ArrowUpRight size={17} strokeWidth={2.6} /></span>
+                </button>
+              </Magnet>
             </div>
 
             <ul className="faq-perks">

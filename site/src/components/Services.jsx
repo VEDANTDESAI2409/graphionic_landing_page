@@ -3,6 +3,9 @@ import { ArrowRight, ChevronLeft, ChevronRight, Target, Users, Clock, Check } fr
 import { SERVICES } from './ServiceFan';
 import { ENGAGEMENT_MODELS } from '../data/site';
 import { useInquiry } from '../context/Inquiry';
+import SpotlightCard from './react-bits/SpotlightCard';
+import BorderTrail from './react-bits/BorderTrail';
+import Magnet from './react-bits/Magnet';
 import { gsap, isReducedMotion } from '../utils/gsapConfig';
 
 const ICONS = { target: Target, users: Users, clock: Clock };
@@ -185,13 +188,18 @@ export default function Services() {
         </div>
       </div>
 
-      <div className="srv-shell">
+      <div className="srv-shell" tabIndex={0} aria-label="Services carousel">
         <div className="srv-track" ref={track}>
           {SERVICES.map((s, i) => {
             const { Icon, tint } = s;
             const title = s.title.replace('\n', ' ');
             return (
-              <article key={title} className="srv">
+              <SpotlightCard
+                key={title}
+                as="article"
+                className="srv"
+                spotlightColor={`${tint}22`}
+              >
                 <span className="srv-ico" style={{ background: `${tint}14`, color: tint }}>
                   <Icon size={24} strokeWidth={2.1} />
                 </span>
@@ -199,7 +207,7 @@ export default function Services() {
                 <span className="srv-num">{String(i + 1).padStart(2, '0')}</span>
                 <span className="srv-rule" style={{ background: tint }} />
                 <span className="srv-go"><ArrowRight size={16} strokeWidth={2.3} /></span>
-              </article>
+              </SpotlightCard>
             );
           })}
         </div>
@@ -226,10 +234,13 @@ export default function Services() {
             const Ico = ICONS[m.icon] || Target;
             const isFocal = i === 1;
             return (
-              <article
+              <SpotlightCard
                 key={m.title}
+                as="article"
                 className={`engage-card${isFocal ? ' is-focal' : ''}`}
+                spotlightColor={isFocal ? 'rgba(210, 255, 40, 0.16)' : 'rgba(0, 122, 255, 0.12)'}
               >
+                {isFocal && <BorderTrail color="#D2FF28" size={140} duration={7} />}
                 {isFocal && <span className="engage-flag">Most popular</span>}
                 <span className="engage-ico"><Ico size={22} strokeWidth={2.1} /></span>
                 <h3>{m.title}</h3>
@@ -241,11 +252,13 @@ export default function Services() {
                 </ul>
                 {m.price && <span className="engage-price">{m.price}</span>}
                 <span className="engage-best">Best for: {m.best}</span>
-                <button className={`btn ${isFocal ? 'btn-lime' : 'btn-dark'} engage-btn`} onClick={openInquiry}>
-                  Get a quote
-                  <span className="ico"><ArrowRight size={15} strokeWidth={2.4} /></span>
-                </button>
-              </article>
+                <Magnet magnetStrength={0.2} padding={20}>
+                  <button className={`btn ${isFocal ? 'btn-lime' : 'btn-dark'} engage-btn`} onClick={openInquiry}>
+                    Get a quote
+                    <span className="ico"><ArrowRight size={15} strokeWidth={2.4} /></span>
+                  </button>
+                </Magnet>
+              </SpotlightCard>
             );
           })}
         </div>

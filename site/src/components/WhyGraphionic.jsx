@@ -4,6 +4,8 @@ import { WHY } from '../data/site';
 import { useInquiry } from '../context/Inquiry';
 import useIsMobile from '../hooks/useIsMobile';
 import WhyPinned from './WhyPinned';
+import TiltedCard from './react-bits/TiltedCard';
+import Magnet from './react-bits/Magnet';
 import { gsap, isReducedMotion } from '../utils/gsapConfig';
 
 const ICONS = { target: Target, code: Code2, gauge: Gauge, users: Users };
@@ -205,21 +207,29 @@ export default function WhyGraphionic() {
         ) : (
           <div className="why-grid" ref={gridRef}>
             {WHY.map((w, i) => (
-              <article
+              <TiltedCard
                 key={w.title}
-                className={`why-card${w.accent === 'lime' ? ' is-lime' : ''}`}
+                maxTilt={8}
+                glare={true}
+                glareOpacity={w.accent === 'lime' ? 0.2 : 0.12}
               >
-                <CardFace w={w} i={i} bare />
-              </article>
+                <article
+                  className={`why-card${w.accent === 'lime' ? ' is-lime' : ''}`}
+                >
+                  <CardFace w={w} i={i} bare />
+                </article>
+              </TiltedCard>
             ))}
           </div>
         )}
 
         <div className="why-cta" ref={ctaRef}>
-          <button className="btn btn-navy" onClick={openInquiry}>
-            Let's Build Together
-            <span className="ico"><ArrowUpRight size={17} strokeWidth={2.6} /></span>
-          </button>
+          <Magnet magnetStrength={0.25} padding={35}>
+            <button className="btn btn-navy" onClick={openInquiry}>
+              Let's Build Together
+              <span className="ico"><ArrowUpRight size={17} strokeWidth={2.6} /></span>
+            </button>
+          </Magnet>
         </div>
       </div>
     </section>

@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { Box, Zap, Users, ArrowRight, ArrowUpRight, Award } from 'lucide-react';
 import useIsMobile from '../hooks/useIsMobile';
+import SpotlightCard from './react-bits/SpotlightCard';
 import { gsap, isReducedMotion } from '../utils/gsapConfig';
 
 const AV = ['#C9D6E5', '#E3D2C3', '#D4C7E8', '#F0D9C7'];
@@ -88,7 +89,7 @@ export default function Stats() {
     <section className="shell" id="stats" ref={sectionRef}>
       <div className={`stats${isMobile ? ' stats--m4' : ''}`}>
         {/* CARD 1 — blue, tall */}
-        <article className="stat stat--blue">
+        <SpotlightCard as="article" className="stat stat--blue" spotlightColor="rgba(255, 255, 255, 0.18)">
           <span className="stat-n" aria-hidden="true">01</span>
           <span className="stat-badge">
             <Box size={19} strokeWidth={2.1} />
@@ -113,10 +114,10 @@ export default function Stats() {
               <ArrowUpRight size={18} strokeWidth={2.4} />
             </span>
           </div>
-        </article>
+        </SpotlightCard>
 
         {/* CARD 2 — light */}
-        <article className="stat stat--light">
+        <SpotlightCard as="article" className="stat stat--light" spotlightColor="rgba(0, 122, 255, 0.12)">
           <span className="stat-n" aria-hidden="true">02</span>
           <span className="stat-badge">
             <Zap size={20} fill="currentColor" strokeWidth={1.6} />
@@ -152,10 +153,10 @@ export default function Stats() {
               <ArrowRight size={18} strokeWidth={2.2} />
             </span>
           </div>
-        </article>
+        </SpotlightCard>
 
         {/* CARD 3 — lime */}
-        <article className="stat stat--lime">
+        <SpotlightCard as="article" className="stat stat--lime" spotlightColor="rgba(10, 15, 29, 0.08)">
           <span className="stat-n" aria-hidden="true">03</span>
           <span className="stat-badge">
             <Users size={19} strokeWidth={2.2} />
@@ -180,11 +181,11 @@ export default function Stats() {
               <ArrowRight size={18} strokeWidth={2.4} />
             </span>
           </div>
-        </article>
+        </SpotlightCard>
 
         {/* CARD 4 — mobile only: 7+ Years, sourced from the Experience banner */}
         {isMobile && (
-          <article className="stat stat--years">
+          <SpotlightCard as="article" className="stat stat--years" spotlightColor="rgba(210, 255, 40, 0.16)">
             <span className="stat-n" aria-hidden="true">04</span>
             <span className="stat-badge">
               <Award size={19} strokeWidth={2.1} />
@@ -199,7 +200,7 @@ export default function Stats() {
                 <ArrowUpRight size={18} strokeWidth={2.4} />
               </span>
             </div>
-          </article>
+          </SpotlightCard>
         )}
       </div>
     </section>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Menu, X, ChevronRight } from 'lucide-react';
 import { useInquiry, scrollToId } from '../context/Inquiry';
+import Magnet from './react-bits/Magnet';
 
 const LINKS = [
   { label: 'Home', id: 'top' },
@@ -120,10 +121,12 @@ export default function Navbar() {
             ))}
           </nav>
 
-          <button className="nav-cta" onClick={openInquiry}>
-            Start Your Project
-            <ArrowRight size={16} strokeWidth={2.6} />
-          </button>
+          <Magnet magnetStrength={0.2} padding={20}>
+            <button className="nav-cta" onClick={openInquiry}>
+              Start Your Project
+              <ArrowRight size={16} strokeWidth={2.6} />
+            </button>
+          </Magnet>
 
           <button
             className="nav-burger"

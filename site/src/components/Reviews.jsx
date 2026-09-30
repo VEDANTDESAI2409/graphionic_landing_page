@@ -1,7 +1,36 @@
 import { useRef, useEffect } from 'react';
 import { Star, ArrowUpRight, MapPin, Users, ThumbsUp } from 'lucide-react';
 import { GOOGLE, COMPANY } from '../data/site';
+import SpotlightCard from './react-bits/SpotlightCard';
+import Magnet from './react-bits/Magnet';
 import { gsap, isReducedMotion } from '../utils/gsapConfig';
+
+const CLIENT_TESTIMONIALS = [
+  {
+    quote:
+      'Graphionic built our security and networking platform with exceptional precision. The product catalogue and industry-wise architecture helped streamline customer inquiries immediately.',
+    author: 'V. Patel',
+    role: 'Operations Director',
+    project: 'VR System & Solution',
+    rating: 5,
+  },
+  {
+    quote:
+      'Our e-commerce store load times and checkout flow improved drastically. Graphionic understood our catalog complexity and delivered a rock-solid, scalable platform.',
+    author: 'R. Sharma',
+    role: 'Founder',
+    project: 'Rapid Electric',
+    rating: 5,
+  },
+  {
+    quote:
+      'From initial architecture to production launch, the engineering quality was outstanding. They are true partners who care deeply about long-term product maintainability.',
+    author: 'A. Miller',
+    role: 'Publisher & Editor',
+    project: 'Fastlane Freedom',
+    rating: 5,
+  },
+];
 
 function GMark({ size = 26 }) {
   return (
@@ -87,6 +116,32 @@ export default function Reviews() {
           </a>
         </div>
 
+        {/* ---- Interactive Client Testimonials Grid ---- */}
+        <div className="reviews-interactive-grid">
+          {CLIENT_TESTIMONIALS.map((t) => (
+            <SpotlightCard
+              key={t.project}
+              as="article"
+              className="rev-card"
+              spotlightColor="rgba(0, 122, 255, 0.12)"
+            >
+              <div className="rev-stars" style={{ marginBottom: '14px' }}>
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <Star key={i} size={15} fill="#FFCE1F" color="#F2B705" strokeWidth={1.5} />
+                ))}
+              </div>
+              <p className="rev-card-quote">&ldquo;{t.quote}&rdquo;</p>
+              <div className="rev-card-author">
+                <div className="rev-author-av">{t.author.charAt(0)}</div>
+                <div className="rev-author-info">
+                  <strong>{t.author}</strong>
+                  <span>{t.role} &middot; {t.project}</span>
+                </div>
+              </div>
+            </SpotlightCard>
+          ))}
+        </div>
+
         <div className="rev-place">
           <MapPin size={17} strokeWidth={2.2} />
           <p>
@@ -95,16 +150,18 @@ export default function Reviews() {
           </p>
         </div>
 
-        <a
-          className="outline-btn"
-          href={GOOGLE.url}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          View All Google Reviews <ArrowUpRight size={16} strokeWidth={2.4} />
-        </a>
+        <Magnet magnetStrength={0.2} padding={25}>
+          <a
+            className="outline-btn"
+            href={GOOGLE.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View All Google Reviews <ArrowUpRight size={16} strokeWidth={2.4} />
+          </a>
+        </Magnet>
 
-        <div className="rev-stats">
+        <div className="rev-stats" tabIndex={0} aria-label="Client review statistics">
           <div><Users size={26} strokeWidth={2} /><strong>{GOOGLE.count}</strong><span>Google Reviews</span></div>
           <span className="rs-div" />
           <div><Star size={26} strokeWidth={2} /><strong>{GOOGLE.rating}/{GOOGLE.outOf}</strong><span>Average Rating</span></div>

@@ -1,6 +1,6 @@
-import { useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowUpRight } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowUpRight, CheckCircle2 } from 'lucide-react';
 import { gsap, isReducedMotion } from '../utils/gsapConfig';
 
 /* dotted-globe: latitude/longitude dot lattice projected onto a sphere */
@@ -50,7 +50,81 @@ function Globe() {
   );
 }
 
+const PROCESS_STEPS = [
+  {
+    num: '01',
+    id: 'discover',
+    name: 'Discover',
+    title: 'Scope & Architecture Analysis',
+    desc: 'We conduct a comprehensive discovery session to understand your business model, target users, security requirements, and technical constraints.',
+    deliverables: [
+      'Requirements & Scope Document',
+      'Technical Architecture Blueprint',
+      'Timeline & Milestone Roadmap',
+    ],
+    quote: 'We clarify every detail before writing code so there are never budget or timeline surprises.',
+    metric: '24h Initial Scoping',
+  },
+  {
+    num: '02',
+    id: 'strategy',
+    name: 'Strategy',
+    title: 'System Design & Tech Selection',
+    desc: 'Our engineers design the database schemas, API contracts, and cloud infrastructure, selecting the optimal modern stack for long-term scalability.',
+    deliverables: [
+      'Scalable Schema & API Specs',
+      'Frontend / Backend Stack Selection',
+      'Security & Compliance Strategy',
+    ],
+    quote: 'Strategic architecture decisions today prevent expensive technical debt tomorrow.',
+    metric: 'Zero Scope Ambiguity',
+  },
+  {
+    num: '03',
+    id: 'design',
+    name: 'Design',
+    title: 'Interactive UI/UX & Prototyping',
+    desc: 'Crafting brand-tailored, intuitive user experiences with high-fidelity Figma components, design tokens, micro-interactions, and accessibility standards.',
+    deliverables: [
+      'Interactive Clickable Prototypes',
+      'Design Token System & Components',
+      'WCAG 2.1 AA Usability Audit',
+    ],
+    quote: 'Design that does not just look beautiful, but actively drives user engagement and conversion.',
+    metric: 'WCAG 2.1 AA Compliant',
+  },
+  {
+    num: '04',
+    id: 'build',
+    name: 'Build',
+    title: 'Full-Stack Agile Engineering',
+    desc: 'Sprint-based development with clean, modular code, automated testing, type safety, and weekly staging deployments for total transparency.',
+    deliverables: [
+      'Clean React 19 / Modern Full-Stack',
+      'Automated CI/CD Pipeline',
+      'Weekly Staging Demonstrations',
+    ],
+    quote: 'Direct access to senior engineers throughout development with weekly demonstrable progress.',
+    metric: '60+ FPS Fluidity',
+  },
+  {
+    num: '05',
+    id: 'launch',
+    name: 'Launch & Scale',
+    title: 'Zero-Downtime Rollout & Growth',
+    desc: 'Production deployment with Core Web Vitals optimization, server hardening, real-time telemetry, and ongoing maintenance support.',
+    deliverables: [
+      'Edge CDN & Cloud Hardening',
+      'Performance & Vitals Certification',
+      'Post-Launch Warranty & Support',
+    ],
+    quote: 'Support does not stop at launch. We ensure your product continues to evolve and scale reliably.',
+    metric: '99.9% Uptime Guarantee',
+  },
+];
+
 export default function Experience() {
+  const [activeStep, setActiveStep] = useState(0);
   const wrapRef = useRef(null);
   const cardRef = useRef(null);
   const titleRef = useRef(null);
@@ -187,6 +261,85 @@ export default function Experience() {
               <ArrowUpRight size={21} strokeWidth={2.3} />
             </a>
           </div>
+        </div>
+
+        {/* ---- Interactive 5-Step Process Journey ---- */}
+        <div className="process-timeline" id="process">
+          <div className="process-head">
+            <span className="pill"><span className="pdot" />How We Work</span>
+            <h3>From Idea to Scaled Product: Our Process</h3>
+            <p>
+              A disciplined, transparent delivery framework engineered to eliminate risk,
+              maintain speed, and ensure high-craft execution at every milestone.
+            </p>
+          </div>
+
+          <div className="process-steps-nav" role="tablist" aria-label="Process steps">
+            <div className="process-nav-line">
+              <div
+                className="process-nav-fill"
+                style={{ width: `${(activeStep / (PROCESS_STEPS.length - 1)) * 100}%` }}
+              />
+            </div>
+
+            {PROCESS_STEPS.map((step, idx) => {
+              const isSelected = activeStep === idx;
+              const isDone = activeStep > idx;
+              return (
+                <button
+                  key={step.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isSelected}
+                  className={`process-step-btn${isSelected ? ' is-active' : ''}${isDone ? ' is-done' : ''}`}
+                  onClick={() => setActiveStep(idx)}
+                >
+                  <span className="process-step-circle">
+                    {isDone ? <CheckCircle2 size={20} strokeWidth={2.6} /> : step.num}
+                  </span>
+                  <span className="process-step-label">{step.name}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={PROCESS_STEPS[activeStep].id}
+              className="process-card-display"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="process-display-left">
+                <h4>Phase {PROCESS_STEPS[activeStep].num} &mdash; {PROCESS_STEPS[activeStep].name}</h4>
+                <h3>{PROCESS_STEPS[activeStep].title}</h3>
+                <p>{PROCESS_STEPS[activeStep].desc}</p>
+
+                <ul className="process-deliverables">
+                  {PROCESS_STEPS[activeStep].deliverables.map((item) => (
+                    <li key={item}>
+                      <CheckCircle2 size={16} strokeWidth={2.4} />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="process-display-right">
+                <span className="process-display-right-decor">
+                  <i /> Engineering Standard
+                </span>
+                <p className="process-right-quote">
+                  &ldquo;{PROCESS_STEPS[activeStep].quote}&rdquo;
+                </p>
+                <span className="process-metric-tag">
+                  {PROCESS_STEPS[activeStep].metric}
+                </span>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </section>

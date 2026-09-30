@@ -2,6 +2,8 @@ import { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Zap, Users, ShieldCheck, Lightbulb, FileText, Code2 } from 'lucide-react';
 import { useInquiry } from '../context/Inquiry';
+import Aurora from './react-bits/Aurora';
+import Magnet from './react-bits/Magnet';
 import { gsap, isReducedMotion } from '../utils/gsapConfig';
 
 const PERKS = [
@@ -139,9 +141,10 @@ export default function FinalCta() {
   return (
     <section className="cta-wrap" id="contact" ref={wrapRef}>
       <div className="shell">
-        <div className="cta" ref={cardRef}>
+        <div className="cta" ref={cardRef} style={{ position: 'relative', overflow: 'hidden' }}>
+          <Aurora colorStops={['#007AFF', '#00A3FF', '#7CD400']} speed={0.5} />
           {/* ---- left ---- */}
-          <div className="cta-left">
+          <div className="cta-left" style={{ position: 'relative', zIndex: 2 }}>
             <span className="pill pill--dark"><span className="pdot" />Let's Work Together</span>
             <h2>
               Have an idea?
@@ -150,10 +153,12 @@ export default function FinalCta() {
             </h2>
             <p>Tell us what you're trying to build, improve or automate.</p>
 
-            <button className="btn btn-lime cta-btn" onClick={openInquiry}>
-              Start Your Project
-              <span className="ico"><ArrowUpRight size={18} strokeWidth={2.6} /></span>
-            </button>
+            <Magnet magnetStrength={0.3} padding={45}>
+              <button className="btn btn-lime cta-btn" onClick={openInquiry}>
+                Start Your Project
+                <span className="ico"><ArrowUpRight size={18} strokeWidth={2.6} /></span>
+              </button>
+            </Magnet>
 
             <ul className="cta-perks">
               {PERKS.map(({ Icon, t, s }) => (

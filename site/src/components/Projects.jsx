@@ -2,6 +2,8 @@ import { useRef, useEffect } from 'react';
 import { ArrowRight, ArrowUpRight, FolderOpen } from 'lucide-react';
 import { PROJECTS, ACCENTS } from '../data/projects';
 import { useInquiry } from '../context/Inquiry';
+import SpotlightCard from './react-bits/SpotlightCard';
+import Magnet from './react-bits/Magnet';
 import { gsap, isReducedMotion } from '../utils/gsapConfig';
 
 function Tile({ p }) {
@@ -66,7 +68,7 @@ export default function Projects() {
 
       // Independent project cards reveal
       if (gridRef.current) {
-        const cards = gridRef.current.querySelectorAll('.prj');
+        const cards = gridRef.current.querySelectorAll('.prj-case-card, .prj');
         if (reduced) {
           gsap.set(cards, { opacity: 1, y: 0, scale: 1 });
         } else {
@@ -116,52 +118,61 @@ export default function Projects() {
               Explore some of the digital products we've built for businesses
               across different industries.
             </p>
-            <button className="ghost-btn" onClick={openInquiry}>
-              Start a Project <ArrowRight size={16} strokeWidth={2.3} />
-            </button>
+            <Magnet magnetStrength={0.2} padding={25}>
+              <button className="ghost-btn" onClick={openInquiry}>
+                Start a Project <ArrowRight size={16} strokeWidth={2.3} />
+              </button>
+            </Magnet>
           </div>
         </div>
 
         {has ? (
-          <div className="prj-grid" ref={gridRef}>
-            {PROJECTS.map((p) => (
-              <article
-                key={p.name}
-                className="prj"
-              >
-                <div className="prj-shot">
-                  <Tile p={p} />
-                </div>
-
-                <div className="prj-body">
-                  {p.category && <span className="prj-cat">{p.category}</span>}
-                  <h3>{p.name}</h3>
-                  {p.description && <p>{p.description}</p>}
-
-                  {(p.metric || p.result) && (
-                    <div className="prj-metric">
-                      {p.metric && <strong>{p.metric}</strong>}
-                      {p.result && <span>{p.result}</span>}
-                    </div>
-                  )}
-
-                  {p.tech?.length > 0 && (
-                    <ul className="prj-tech">
-                      {p.tech.map((t) => <li key={t}>{t}</li>)}
-                    </ul>
-                  )}
-
-                  <div className="prj-foot">
-                    {p.url ? (
-                      <a className="prj-link" href={p.url} target="_blank" rel="noopener noreferrer">
-                        View live project <ArrowUpRight size={15} strokeWidth={2.4} />
-                      </a>
-                    ) : <span />}
-                    <span className="prj-go"><ArrowRight size={16} strokeWidth={2.3} /></span>
+          <div className="prj-case-grid" ref={gridRef}>
+            {PROJECTS.map((p, index) => {
+              const isReversed = index % 2 === 1;
+              return (
+                <SpotlightCard
+                  key={p.name}
+                  as="article"
+                  className={`prj-case-card${isReversed ? ' is-reversed' : ''}`}
+                  spotlightColor="rgba(0, 122, 255, 0.12)"
+                >
+                  <div className="prj-case-shot">
+                    <Tile p={p} />
                   </div>
-                </div>
-              </article>
-            ))}
+
+                  <div className="prj-case-content">
+                    {p.category && <span className="prj-cat">{p.category}</span>}
+                    <h3>{p.name}</h3>
+                    {p.description && <p>{p.description}</p>}
+
+                    {(p.metric || p.result) && (
+                      <div className="prj-metric">
+                        {p.metric && <strong>{p.metric}</strong>}
+                        {p.result && <span>{p.result}</span>}
+                      </div>
+                    )}
+
+                    {p.tech?.length > 0 && (
+                      <ul className="prj-tech">
+                        {p.tech.map((t) => <li key={t}>{t}</li>)}
+                      </ul>
+                    )}
+
+                    <div className="prj-foot">
+                      {p.url ? (
+                        <Magnet magnetStrength={0.2} padding={20}>
+                          <a className="prj-link" href={p.url} target="_blank" rel="noopener noreferrer">
+                            View live project <ArrowUpRight size={15} strokeWidth={2.4} />
+                          </a>
+                        </Magnet>
+                      ) : <span />}
+                      <span className="prj-go"><ArrowRight size={16} strokeWidth={2.3} /></span>
+                    </div>
+                  </div>
+                </SpotlightCard>
+              );
+            })}
           </div>
         ) : null}
 
