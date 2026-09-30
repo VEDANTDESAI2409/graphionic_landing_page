@@ -1,0 +1,23 @@
+# Dependencies
+node_modules
+site/node_modules
+
+# Build outputs
+dist
+site/dist
+dist-ssr
+
+# Test & Audit Artifacts
+test-results
+site/test-results
+playwright-report
+site/playwright-report
+
+# Logs
+*.log
+logs
+
+# Environment & Local files
+.env
+.env.local
+.DS_Store
