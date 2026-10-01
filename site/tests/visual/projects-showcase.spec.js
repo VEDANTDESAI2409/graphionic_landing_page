@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
 
-const ARTIFACT_DIR = 'C:\\Users\\vedan\\.gemini\\antigravity-ide\\brain\\813d3025-cf08-43ce-9569-2ef2f5677de7';
+const ARTIFACT_DIR = 'C:\\Users\\vedan\\.gemini\\antigravity-ide\\brain\\ebf3de02-7a7d-45d4-9042-860bef483f39';
 
-test.describe('Graphionic Infotech — Projects 3-Card Showcase Verification', () => {
+test.describe('Graphionic Infotech — Projects Orbit Showcase Verification', () => {
   test('desktop showcase layout, interaction, and screenshots', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/', { waitUntil: 'networkidle' });
@@ -13,7 +13,7 @@ test.describe('Graphionic Infotech — Projects 3-Card Showcase Verification', (
     await page.waitForTimeout(600);
 
     // Verify section header
-    await expect(projectsSection.locator('h2')).toContainText('Turning Ideas');
+    await expect(projectsSection.locator('h2')).toContainText('Built');
 
     // Verify 3 cards are positioned on desktop
     const centerCard = projectsSection.locator('.position-center');
@@ -24,12 +24,14 @@ test.describe('Graphionic Infotech — Projects 3-Card Showcase Verification', (
     await expect(leftCard).toBeVisible();
     await expect(rightCard).toBeVisible();
 
-    // Verify center card elements: dots, title, badge, desc, tags, CTA
-    await expect(centerCard.locator('.prj-card-dots')).toBeVisible();
+    // Verify orbit navigation and showcase card elements
+    await expect(projectsSection.locator('.prj-orbit-nav')).toBeVisible();
+    await expect(centerCard.locator('.prj-laptop-deck')).toBeVisible();
     await expect(centerCard.locator('.prj-card-title')).toBeVisible();
     await expect(centerCard.locator('.prj-card-badge')).toBeVisible();
     await expect(centerCard.locator('.prj-card-desc')).toBeVisible();
     await expect(centerCard.locator('.prj-card-tags')).toBeVisible();
+    await expect(centerCard.locator('.prj-metrics-grid')).toBeVisible();
     await expect(centerCard.locator('.prj-card-cta')).toBeVisible();
 
     // Verify CTA link has target="_blank"
