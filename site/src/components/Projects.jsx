@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ArrowRight, ShieldCheck, Zap, Users } from 'lucide-react';
 import { PROJECTS } from '../data/projects';
 import { useInquiry } from '../context/Inquiry';
-import { gsap, ScrollTrigger, isReducedMotion } from '../utils/gsapConfig';
+import { gsap, isReducedMotion } from '../utils/gsapConfig';
 
 const TECH_DOT_COLORS = ['#8B5CF6', '#007AFF', '#06B6D4', '#10B981', '#F59E0B'];
 
@@ -31,19 +31,19 @@ function renderMetricIcon(iconType, index) {
 
 /**
  * Calculates coordinates along the curved orbit path
- * Path parameters in viewBox 0 0 180 520
- * Curve formula: Q 170 260 65 495 from 65 25
+ * Path parameters in viewBox 0 0 160 440
+ * Curve formula: Q 150 220 55 420 from 55 20
  */
 function getOrbitCoord(index, total) {
-  if (total <= 1) return { x: 120, y: 260 };
+  if (total <= 1) return { x: 100, y: 220 };
   const t = index / (total - 1);
   // Quadratic bezier: B(t) = (1-t)^2 * P0 + 2(1-t)t * P1 + t^2 * P2
-  const p0x = 65;
-  const p0y = 25;
-  const p1x = 170;
-  const p1y = 260;
-  const p2x = 65;
-  const p2y = 495;
+  const p0x = 55;
+  const p0y = 20;
+  const p1x = 150;
+  const p1y = 220;
+  const p2x = 55;
+  const p2y = 420;
 
   const mt = 1 - t;
   const x = mt * mt * p0x + 2 * mt * t * p1x + t * t * p2x;
@@ -60,9 +60,6 @@ export default function Projects() {
   // Default to index 2 (Project 03) matching the primary reference design
   const [activeIndex, setActiveIndex] = useState(() => (PROJECTS.length > 2 ? 2 : 0));
   const activeIndexRef = useRef(activeIndex);
-  const isProgrammaticScrollRef = useRef(false);
-  const scrollTimeoutRef = useRef(null);
-  const scrollTriggerRef = useRef(null);
 
   const { openInquiry } = useInquiry();
   const shouldReduceMotion = useReducedMotion();
@@ -74,56 +71,16 @@ export default function Projects() {
   }, [activeIndex]);
 
   /**
-   * Computes the document scroll position corresponding to a specific project
-   * within the pinned scroll timeline.
-   */
-  const getProjectScrollY = useCallback(
-    (targetIndex) => {
-      const track = trackRef.current;
-      if (!track || typeof window === 'undefined') return 0;
-      const rect = track.getBoundingClientRect();
-      const trackTop = rect.top + window.scrollY;
-      const scrollDistance = track.offsetHeight - window.innerHeight;
-      const progress = targetIndex / Math.max(1, total - 1);
-      return Math.round(trackTop + progress * Math.max(0, scrollDistance));
-    },
-    [total]
-  );
-
-  /**
    * Unified single source of truth for changing active project:
-   * Synchronizes activeProjectIndex, UI state, animations, and pinned scroll timeline.
+   * Direct state update with no scroll-locking, no Lenis interception, and no page scrub.
    */
   const navigateToProject = useCallback(
     (targetIndex) => {
       const clamped = Math.max(0, Math.min(total - 1, targetIndex));
       setActiveIndex(clamped);
       activeIndexRef.current = clamped;
-
-      isProgrammaticScrollRef.current = true;
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-
-      const targetY = getProjectScrollY(clamped);
-
-      if (typeof window !== 'undefined' && window.__lenis) {
-        window.__lenis.scrollTo(targetY, {
-          duration: 0.85,
-          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-          onComplete: () => {
-            isProgrammaticScrollRef.current = false;
-          },
-        });
-        scrollTimeoutRef.current = setTimeout(() => {
-          isProgrammaticScrollRef.current = false;
-        }, 950);
-      } else if (typeof window !== 'undefined') {
-        window.scrollTo({ top: targetY, behavior: 'smooth' });
-        scrollTimeoutRef.current = setTimeout(() => {
-          isProgrammaticScrollRef.current = false;
-        }, 850);
-      }
     },
-    [total, getProjectScrollY]
+    [total]
   );
 
   const handlePrev = useCallback(() => {
@@ -162,66 +119,34 @@ export default function Projects() {
     }
   };
 
-  // GSAP ScrollTrigger Pinned Scroll & Synchronization
+  // Section header entrance (standard page-flow scroll reveal)
   useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-
+    if (!headRef.current) return;
     const ctx = gsap.context(() => {
       const reduced = isReducedMotion();
-
-      // Section header entrance
-      if (headRef.current) {
-        if (reduced) {
-          gsap.set(headRef.current, { opacity: 1, y: 0 });
-        } else {
-          gsap.fromTo(
-            headRef.current,
-            { opacity: 0, y: 24 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.7,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: headRef.current,
-                start: 'top 85%',
-                once: true,
-              },
-            }
-          );
-        }
-      }
-
-      if (reduced) return;
-
-      // Pinned Scroll Timeline Tracker
-      const st = ScrollTrigger.create({
-        trigger: track,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 0.5,
-        onUpdate: (self) => {
-          if (isProgrammaticScrollRef.current) return;
-          const progress = self.progress; // 0.0 to 1.0
-          const rawIndex = progress * (total - 1);
-          const newIndex = Math.max(0, Math.min(total - 1, Math.round(rawIndex)));
-
-          if (newIndex !== activeIndexRef.current) {
-            activeIndexRef.current = newIndex;
-            setActiveIndex(newIndex);
+      if (reduced) {
+        gsap.set(headRef.current, { opacity: 1, y: 0 });
+      } else {
+        gsap.fromTo(
+          headRef.current,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: headRef.current,
+              start: 'top 85%',
+              once: true,
+            },
           }
-        },
-      });
-
-      scrollTriggerRef.current = st;
+        );
+      }
     }, sectionRef);
 
-    return () => {
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-      ctx.revert();
-    };
-  }, [total]);
+    return () => ctx.revert();
+  }, []);
 
   const activeProject = PROJECTS[activeIndex] || PROJECTS[0];
   const prevIndex = (activeIndex - 1 + total) % total;
@@ -298,13 +223,13 @@ export default function Projects() {
               <nav className="prj-orbit-nav" aria-label="Projects orbit navigation">
                 <svg
                   className="prj-orbit-svg"
-                  viewBox="0 0 180 520"
+                  viewBox="0 0 160 440"
                   fill="none"
                   preserveAspectRatio="none"
                   aria-hidden="true"
                 >
                   {/* Thin light-blue curved orbit path */}
-                  <path d="M 65 25 Q 170 260 65 495" className="prj-orbit-path" />
+                  <path d="M 55 20 Q 150 220 55 420" className="prj-orbit-path" />
 
                   {/* Orbit Nodes placed along curve */}
                   {PROJECTS.map((p, i) => {
@@ -350,7 +275,7 @@ export default function Projects() {
                         tabIndex={0}
                         className={`prj-orbit-btn ${isActive ? 'is-active' : ''}`}
                         onClick={() => navigateToProject(index)}
-                        style={{ top: `${y}px`, right: `${180 - x + 16}px` }}
+                        style={{ top: `${y}px`, right: `${160 - x + 14}px` }}
                         aria-label={`Select project ${num}: ${project.name}`}
                         aria-pressed={isActive}
                       >
