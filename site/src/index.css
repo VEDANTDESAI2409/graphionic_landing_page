@@ -1174,11 +1174,30 @@ img { max-width: 100%; display: block; }
    7 — PROJECTS (ORBIT SHOWCASE REDESIGN)
    ============================================================ */
 .prj-showcase-section {
-  padding: 100px 0 112px;
   background: #F7FAFD;
   position: relative;
+  overflow: visible;
+  scroll-margin-top: 0;
+}
+
+/* Pinned Scroll Track & Sticky Viewport */
+.prj-pinned-track {
+  position: relative;
+  width: 100%;
+}
+.prj-sticky-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  min-height: 600px;
+  max-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   overflow: hidden;
-  scroll-margin-top: 90px;
+  box-sizing: border-box;
+  padding: 66px 0 24px;
 }
 
 /* Atmospheric Glows & Mesh Orbs */
@@ -1230,6 +1249,7 @@ img { max-width: 100%; display: block; }
 .prj-shell {
   position: relative;
   z-index: 2;
+  width: 100%;
 }
 
 /* Section Header (Centered Pill, Heading with Lime Sparks & Subtitle) */
@@ -1548,12 +1568,18 @@ img { max-width: 100%; display: block; }
   background: #FFFFFF;
   border: 1px solid rgba(0, 122, 255, 0.09);
   box-shadow: 0 30px 80px -20px rgba(0, 60, 140, 0.13), 0 10px 28px -8px rgba(0, 0, 0, 0.04);
-  padding: 38px 40px;
+  padding: 34px 38px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Inner Animated Content Grid */
+.prj-card-content-grid {
   display: grid;
   grid-template-columns: 1.05fr 1fr;
-  gap: 36px;
+  gap: 34px;
   align-items: center;
-  box-sizing: border-box;
+  width: 100%;
 }
 
 /* Card Left Column: Realistic Laptop Mockup */
@@ -1890,7 +1916,22 @@ img { max-width: 100%; display: block; }
 
 @media (max-width: 860px) {
   .prj-showcase-section {
-    padding: 76px 0 84px;
+    padding: 0;
+  }
+  .prj-sticky-stage {
+    padding: 88px 0 16px;
+    height: 100dvh;
+    min-height: 100dvh;
+  }
+  .prj-header-center {
+    margin-bottom: 10px;
+  }
+  .prj-heading {
+    margin: 6px 0 4px;
+    font-size: 24px;
+  }
+  .prj-subtitle {
+    display: none;
   }
   .prj-layout-wrap {
     grid-template-columns: 1fr;
@@ -1903,9 +1944,9 @@ img { max-width: 100%; display: block; }
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 28px;
-    padding: 7px 16px;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 4px 14px;
     background: #FFFFFF;
     border-radius: 999px;
     border: 1px solid rgba(0, 122, 255, 0.14);
@@ -1917,16 +1958,16 @@ img { max-width: 100%; display: block; }
   .prj-mobile-orbit-btn {
     background: none;
     border: none;
-    padding: 5px 12px;
+    padding: 4px 10px;
     border-radius: 999px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     transition: all 0.2s ease;
   }
   .prj-mobile-orbit-num {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: #94A3B8;
   }
@@ -1946,32 +1987,53 @@ img { max-width: 100%; display: block; }
   }
 
   .prj-showcase-card {
-    grid-template-columns: 1fr;
-    padding: 24px;
-    border-radius: 28px;
-    gap: 24px;
+    padding: 18px 16px;
+    border-radius: 24px;
     max-width: 100%;
   }
+  .prj-card-content-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .prj-laptop-deck {
+    max-width: 290px;
+  }
   .prj-main-title {
-    font-size: 22px;
+    font-size: 20px;
+    margin: 0 0 8px;
+  }
+  .prj-main-desc {
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0 0 12px;
+  }
+  .prj-tech-pills {
+    margin-bottom: 12px;
+  }
+  .prj-info-divider {
+    margin-bottom: 12px;
   }
   .prj-metrics-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
+    margin-bottom: 16px;
   }
   .prj-metric-val {
-    font-size: 17px;
+    font-size: 16px;
   }
   .prj-metric-label {
-    font-size: 10.5px;
+    font-size: 10px;
   }
   .prj-actions-row {
     flex-direction: column;
     width: 100%;
+    gap: 8px;
   }
   .prj-btn-primary, .prj-btn-secondary {
     width: 100%;
     justify-content: center;
+    padding: 11px 18px;
+    font-size: 13.5px;
   }
   .prj-mobile-arrows {
     display: flex;

@@ -39,21 +39,27 @@ test.describe('Graphionic Infotech — Projects Orbit Showcase Verification', ()
     const href = await ctaLink.getAttribute('href');
     expect(href).toMatch(/^https?:\/\//);
 
-    // Take screenshot of desktop showcase
+    // Take screenshot of desktop showcase sticky stage
+    const stickyStage = page.locator('.prj-sticky-stage');
     const desktopScreenshotPath = path.join(ARTIFACT_DIR, 'projects_showcase_desktop.png');
-    await projectsSection.screenshot({ path: desktopScreenshotPath });
+    await stickyStage.screenshot({ path: desktopScreenshotPath });
+
+    // Test clicking an Orbit Number Button directly (e.g. Project 03)
+    const orbitBtns = projectsSection.locator('.prj-orbit-btn');
+    await expect(orbitBtns).toHaveCount(5);
+    await orbitBtns.nth(2).click(); // Click Project 03 (Fastlane Freedom)
+    await page.waitForTimeout(600);
+    const orbit3Title = await projectsSection.locator('.position-center .prj-card-title').textContent();
+    expect(orbit3Title).toBe('Fastlane Freedom');
 
     // Test clicking Next Arrow button
     const nextBtn = projectsSection.locator('.prj-arrow-btn[aria-label="Next project"]');
-    const initialTitle = await centerCard.locator('.prj-card-title').textContent();
-
-    await nextBtn.click();
+    await nextBtn.click(); // Should go to Project 04 (BiO-G)
     await page.waitForTimeout(600);
-
     const newTitle = await projectsSection.locator('.position-center .prj-card-title').textContent();
-    expect(newTitle).not.toEqual(initialTitle);
+    expect(newTitle).toBe('BiO-G');
 
-    // Test clicking pagination dot
+    // Test clicking pagination dot 1 (VR System & Solution)
     const dots = projectsSection.locator('.prj-page-dot');
     await expect(dots).toHaveCount(5);
     await dots.nth(0).click();
@@ -84,8 +90,91 @@ test.describe('Graphionic Infotech — Projects Orbit Showcase Verification', ()
     });
     expect(hasHorizontalOverflow).toBe(false);
 
-    // Take screenshot of mobile showcase
+    // Test mobile orbit button navigation
+    const mobileOrbitBtns = projectsSection.locator('.prj-mobile-orbit-btn');
+    await expect(mobileOrbitBtns).toHaveCount(5);
+    await mobileOrbitBtns.nth(2).click(); // Click Project 03 (Fastlane Freedom)
+    await page.waitForTimeout(600);
+    const mobileTitle = await projectsSection.locator('.position-center .prj-card-title').textContent();
+    expect(mobileTitle).toBe('Fastlane Freedom');
+
+    // Take screenshot of mobile showcase sticky stage
     const mobileScreenshotPath = path.join(ARTIFACT_DIR, 'projects_showcase_mobile.png');
-    await projectsSection.screenshot({ path: mobileScreenshotPath });
+    await page.locator('.prj-sticky-stage').screenshot({ path: mobileScreenshotPath });
+  });
+
+  test('scroll-driven pinned timeline progresses projects forward and backward', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/', { waitUntil: 'networkidle' });
+
+    const track = page.locator('.prj-pinned-track');
+    await expect(track).toBeVisible();
+
+    const trackBox = await track.boundingBox();
+    expect(trackBox).not.toBeNull();
+    const trackTop = trackBox.y + (await page.evaluate(() => window.scrollY));
+    const trackHeight = trackBox.height;
+    const scrollableDistance = trackHeight - 900;
+
+    // Scroll to Project 01 (progress ~0%)
+    await page.evaluate((top) => window.scrollTo(0, top), trackTop);
+    await page.waitForTimeout(400);
+    let title = await page.locator('.position-center .prj-card-title').textContent();
+    expect(title).toBe('VR System & Solution');
+
+    // Scroll to Project 03 (progress ~50%)
+    await page.evaluate(
+      ({ top, dist }) => window.scrollTo(0, top + dist * 0.5),
+      { top: trackTop, dist: scrollableDistance }
+    );
+    await page.waitForTimeout(500);
+    title = await page.locator('.position-center .prj-card-title').textContent();
+    expect(title).toBe('Fastlane Freedom');
+
+    // Scroll to Project 05 (progress ~100%)
+    await page.evaluate(
+      ({ top, dist }) => window.scrollTo(0, top + dist),
+      { top: trackTop, dist: scrollableDistance }
+    );
+    await page.waitForTimeout(500);
+    title = await page.locator('.position-center .prj-card-title').textContent();
+    expect(title).toBe('Sunflower Inn and Suites');
+
+    // Scroll backward to Project 02 (progress ~25%)
+    await page.evaluate(
+      ({ top, dist }) => window.scrollTo(0, top + dist * 0.25),
+      { top: trackTop, dist: scrollableDistance }
+    );
+    await page.waitForTimeout(500);
+    title = await page.locator('.position-center .prj-card-title').textContent();
+    expect(title).toBe('Rapid Electric');
+  });
+
+  test('keyboard arrow navigation and accessibility attributes', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/', { waitUntil: 'networkidle' });
+
+    const stage = page.locator('.prj-stage-area');
+    await stage.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(400);
+
+    // Focus the stage area and press ArrowRight
+    await stage.focus();
+    await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(500);
+    let title = await page.locator('.position-center .prj-card-title').textContent();
+    expect(title).toBe('Rapid Electric');
+
+    // Press ArrowRight again
+    await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(500);
+    title = await page.locator('.position-center .prj-card-title').textContent();
+    expect(title).toBe('Fastlane Freedom');
+
+    // Press ArrowLeft
+    await page.keyboard.press('ArrowLeft');
+    await page.waitForTimeout(500);
+    title = await page.locator('.position-center .prj-card-title').textContent();
+    expect(title).toBe('Rapid Electric');
   });
 });
