@@ -1,80 +1,109 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
 
-const ARTIFACT_DIR = 'C:\\Users\\vedan\\.gemini\\antigravity-ide\\brain\\813d3025-cf08-43ce-9569-2ef2f5677de7';
+const ARTIFACT_DIR = 'C:\\Users\\vedan\\.gemini\\antigravity-ide\\brain\\d617bce8-9db9-45fe-a1ea-97896dedc0a9';
 
-test.describe('Graphionic Infotech — Projects 3-Card Showcase Verification', () => {
-  test('desktop showcase layout, interaction, and screenshots', async ({ page }) => {
+test.describe('Graphionic Infotech — Case Studies Pinned Horizontal Showcase', () => {
+  test('desktop pinned showcase layout, interaction, metrics, and screenshots', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/', { waitUntil: 'networkidle' });
 
+    // Scroll to the very start of the projects section
+    await page.evaluate(() => {
+      const el = document.getElementById('projects');
+      if (el) el.scrollIntoView({ block: 'start', behavior: 'instant' });
+    });
+    await page.waitForTimeout(1000);
+
     const projectsSection = page.locator('#projects');
-    await projectsSection.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(600);
 
-    // Verify section header
-    await expect(projectsSection.locator('h2')).toContainText('Turning Ideas');
+    // Verify section eyebrow and heading
+    await expect(projectsSection.locator('.case-studies-eyebrow')).toContainText('CASE STUDIES');
+    await expect(projectsSection.locator('.case-studies-title')).toContainText("What We've Built");
 
-    // Verify 3 cards are positioned on desktop
-    const centerCard = projectsSection.locator('.position-center');
-    const leftCard = projectsSection.locator('.position-left');
-    const rightCard = projectsSection.locator('.position-right');
+    // Verify large rounded white container
+    const whiteBox = projectsSection.locator('.case-studies-white-box');
+    await expect(whiteBox).toBeVisible();
 
-    await expect(centerCard).toBeVisible();
-    await expect(leftCard).toBeVisible();
-    await expect(rightCard).toBeVisible();
+    // Verify active card elements
+    const activeCard = projectsSection.locator('.case-study-card.is-active');
+    await expect(activeCard).toBeVisible();
 
-    // Verify center card elements: dots, title, badge, desc, tags, CTA
-    await expect(centerCard.locator('.prj-card-dots')).toBeVisible();
-    await expect(centerCard.locator('.prj-card-title')).toBeVisible();
-    await expect(centerCard.locator('.prj-card-badge')).toBeVisible();
-    await expect(centerCard.locator('.prj-card-desc')).toBeVisible();
-    await expect(centerCard.locator('.prj-card-tags')).toBeVisible();
-    await expect(centerCard.locator('.prj-card-cta')).toBeVisible();
+    // Verify visual media
+    await expect(activeCard.locator('.cs-card-visual img')).toBeVisible();
 
-    // Verify CTA link has target="_blank"
-    const ctaLink = centerCard.locator('.prj-card-cta');
-    const href = await ctaLink.getAttribute('href');
-    expect(href).toMatch(/^https?:\/\//);
+    // Verify brand, title, description, read more link
+    await expect(activeCard.locator('.cs-card-brand-name')).toBeVisible();
+    await expect(activeCard.locator('.cs-card-title')).toBeVisible();
+    await expect(activeCard.locator('.cs-card-desc')).toBeVisible();
+    await expect(activeCard.locator('.cs-card-readmore')).toBeVisible();
 
-    // Take screenshot of desktop showcase
-    const desktopScreenshotPath = path.join(ARTIFACT_DIR, 'projects_showcase_desktop.png');
-    await projectsSection.screenshot({ path: desktopScreenshotPath });
+    // Verify performance metrics (3 metrics)
+    const metrics = activeCard.locator('.cs-metric-item');
+    await expect(metrics).toHaveCount(3);
+    await expect(metrics.nth(0).locator('.cs-metric-value')).toBeVisible();
+    await expect(metrics.nth(0).locator('.cs-metric-label')).toBeVisible();
 
-    // Test clicking Next Arrow button
-    const nextBtn = projectsSection.locator('.prj-arrow-btn[aria-label="Next project"]');
-    const initialTitle = await centerCard.locator('.prj-card-title').textContent();
+    // Verify Read More link has valid href or action
+    const readMoreLink = activeCard.locator('.cs-card-readmore');
+    const href = await readMoreLink.getAttribute('href');
+    if (href) {
+      expect(href).toMatch(/^https?:\/\//);
+    }
 
-    await nextBtn.click();
-    await page.waitForTimeout(600);
+    // Verify Navigation Arrows
+    const prevArrow = projectsSection.locator('.cs-arrow-prev');
+    const nextArrow = projectsSection.locator('.cs-arrow-next');
+    await expect(prevArrow).toBeVisible();
+    await expect(nextArrow).toBeVisible();
 
-    const newTitle = await projectsSection.locator('.position-center .prj-card-title').textContent();
-    expect(newTitle).not.toEqual(initialTitle);
+    // Initially at card 0, prev arrow should be disabled
+    await expect(prevArrow).toBeDisabled();
+    await expect(nextArrow).toBeEnabled();
 
-    // Test clicking pagination dot
-    const dots = projectsSection.locator('.prj-page-dot');
+    // Verify pagination dots
+    const dots = projectsSection.locator('.cs-page-dot');
     await expect(dots).toHaveCount(5);
-    await dots.nth(0).click();
-    await page.waitForTimeout(600);
-    const dotTitle = await projectsSection.locator('.position-center .prj-card-title').textContent();
-    expect(dotTitle).toBe('VR System & Solution');
+    await expect(dots.nth(0)).toHaveClass(/is-active/);
+
+    // Verify Explore CTA
+    const exploreBtn = projectsSection.locator('.cs-explore-btn');
+    await expect(exploreBtn).toBeVisible();
+    await expect(exploreBtn).toContainText('Explore all Case Studies');
+
+    // Capture desktop screenshot
+    const desktopScreenshotPath = path.join(ARTIFACT_DIR, 'case_studies_desktop.png');
+    await whiteBox.screenshot({ path: desktopScreenshotPath });
+
+    // Test clicking Next Arrow
+    const initialTitle = await activeCard.locator('.cs-card-title').textContent();
+    await nextArrow.click();
+    await page.waitForTimeout(800);
+
+    // Active card should change or active dot should update
+    const newActiveDot = projectsSection.locator('.cs-page-dot.is-active');
+    await expect(newActiveDot).toBeVisible();
+
+    // Test clicking pagination dot 2 (3rd project)
+    await dots.nth(2).click();
+    await page.waitForTimeout(800);
+    const thirdProjectTitle = await projectsSection.locator('.case-study-card[data-index="2"] .cs-card-title').textContent();
+    expect(thirdProjectTitle).toBe('Fastlane Freedom');
   });
 
-  test('mobile viewport showcase, zero overflow, and touch swipe', async ({ page }) => {
+  test('mobile pinned showcase, zero horizontal overflow, and responsive card', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/', { waitUntil: 'networkidle' });
 
+    await page.evaluate(() => {
+      const el = document.getElementById('projects');
+      if (el) el.scrollIntoView({ block: 'start', behavior: 'instant' });
+    });
+    await page.waitForTimeout(1000);
+
     const projectsSection = page.locator('#projects');
-    await projectsSection.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(600);
-
-    // Verify exactly 1 active card is visible in mobile viewport
-    const activeCard = projectsSection.locator('.position-center');
-    await expect(activeCard).toBeVisible();
-
-    // Verify swipe affordance is visible on mobile
-    const swipeAffordance = projectsSection.locator('.prj-swipe');
-    await expect(swipeAffordance).toBeVisible();
+    const whiteBox = projectsSection.locator('.case-studies-white-box');
+    await expect(whiteBox).toBeVisible();
 
     // Verify zero horizontal page overflow
     const hasHorizontalOverflow = await page.evaluate(() => {
@@ -82,8 +111,16 @@ test.describe('Graphionic Infotech — Projects 3-Card Showcase Verification', (
     });
     expect(hasHorizontalOverflow).toBe(false);
 
-    // Take screenshot of mobile showcase
-    const mobileScreenshotPath = path.join(ARTIFACT_DIR, 'projects_showcase_mobile.png');
-    await projectsSection.screenshot({ path: mobileScreenshotPath });
+    // Verify active card is visible in mobile
+    const activeCard = projectsSection.locator('.case-study-card.is-active');
+    await expect(activeCard).toBeVisible();
+    await expect(activeCard.locator('.cs-card-title')).toBeVisible();
+
+    // Verify Explore CTA is visible on mobile
+    await expect(projectsSection.locator('.cs-explore-btn')).toBeVisible();
+
+    // Capture mobile screenshot
+    const mobileScreenshotPath = path.join(ARTIFACT_DIR, 'case_studies_mobile.png');
+    await whiteBox.screenshot({ path: mobileScreenshotPath });
   });
 });

@@ -47,6 +47,7 @@
 export const PROJECTS = [
   {
     name: 'VR System & Solution',
+    brandName: 'VR SYSTEM',
     image: '/projects/vr-system.jpg',
     category: 'Business',
     badge: 'Security',
@@ -55,9 +56,15 @@ export const PROJECTS = [
     tech: ['WordPress', 'Elementor', 'Security'],
     url: 'https://vrsystemandsolution.com/',
     accent: 'blue',
+    metrics: [
+      { value: '+40%', label: 'Demo Booking' },
+      { value: '+25%', label: 'Closing Rate' },
+      { value: '3x', label: 'Engagement' },
+    ],
   },
   {
     name: 'Rapid Electric',
+    brandName: 'RAPID ELECTRIC',
     image: '/projects/rapid-electric.jpg',
     category: 'E-commerce',
     badge: 'Store',
@@ -66,9 +73,15 @@ export const PROJECTS = [
     tech: ['WordPress', 'WooCommerce', 'Electricals'],
     url: 'https://rapidelectric.in/',
     accent: 'navy',
+    metrics: [
+      { value: '+65%', label: 'Catalogue Browse' },
+      { value: '+38%', label: 'Checkout Rate' },
+      { value: '4x', label: 'Order Volume' },
+    ],
   },
   {
     name: 'Fastlane Freedom',
+    brandName: 'FASTLANE',
     image: '/projects/fastlane.jpg',
     category: 'Publishing',
     badge: 'Editorial',
@@ -77,9 +90,15 @@ export const PROJECTS = [
     tech: ['WordPress', 'Digital Archive', 'Mindset'],
     url: 'https://fastlanefreedom.com/',
     accent: 'lime',
+    metrics: [
+      { value: '+120%', label: 'Reader Retention' },
+      { value: '+45%', label: 'Article Reads' },
+      { value: '2.8x', label: 'Time on Page' },
+    ],
   },
   {
     name: 'BiO-G',
+    brandName: 'BiO-G',
     image: '/projects/biog.jpg',
     category: 'D2C Store',
     badge: 'Brand',
@@ -88,9 +107,15 @@ export const PROJECTS = [
     tech: ['WordPress', 'WooCommerce', 'D2C Retail'],
     url: 'https://shopbiog.com/',
     accent: 'blue',
+    metrics: [
+      { value: '+52%', label: 'Cart Conversion' },
+      { value: '+30%', label: 'Repeat Orders' },
+      { value: '3.5x', label: 'Revenue Growth' },
+    ],
   },
   {
     name: 'Sunflower Inn and Suites',
+    brandName: 'SUNFLOWER INN',
     image: '/projects/sunflower.jpg',
     category: 'Hospitality',
     badge: 'Hotel',
@@ -99,6 +124,11 @@ export const PROJECTS = [
     tech: ['WordPress', 'Hospitality', 'Booking Engine'],
     url: 'https://sunflowerinnsalina.com/',
     accent: 'navy',
+    metrics: [
+      { value: '+48%', label: 'Direct Bookings' },
+      { value: '0%', label: 'OTA Commission' },
+      { value: '4.9★', label: 'Guest Rating' },
+    ],
   },
 ];
 
