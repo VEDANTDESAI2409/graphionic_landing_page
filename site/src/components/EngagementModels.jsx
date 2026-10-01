@@ -291,8 +291,13 @@ export default function EngagementModels() {
                       <span className="eng-card-ico" aria-hidden="true">
                         <Ico size={22} strokeWidth={2.2} />
                       </span>
-                      {isFocalBadge && isActive && (
-                        <span className="eng-card-badge">MOST POPULAR</span>
+                      {isFocalBadge && (
+                        <span
+                          className={`eng-card-badge${isActive ? ' is-visible' : ''}`}
+                          aria-hidden={!isActive}
+                        >
+                          MOST POPULAR
+                        </span>
                       )}
                     </div>
 
@@ -325,14 +330,15 @@ export default function EngagementModels() {
                     </div>
                   </div>
 
-                  {/* Right Column: Visual Graphic (Visible only when card is active) */}
-                  {isActive && (
-                    <div className="eng-card-visual-slot">
-                      {i === 0 && <FixedScopeVisual isActive={isActive} />}
-                      {i === 1 && <DedicatedTeamVisual isActive={isActive} />}
-                      {i === 2 && <SupportVisual isActive={isActive} />}
-                    </div>
-                  )}
+                  {/* Right Column: Visual Graphic (Kept mounted to eliminate reflow and visual rebuilding) */}
+                  <div
+                    className={`eng-card-visual-slot${isActive ? ' is-active' : ''}`}
+                    aria-hidden={!isActive}
+                  >
+                    {i === 0 && <FixedScopeVisual isActive={isActive} />}
+                    {i === 1 && <DedicatedTeamVisual isActive={isActive} />}
+                    {i === 2 && <SupportVisual isActive={isActive} />}
+                  </div>
                 </div>
               </div>
             );
