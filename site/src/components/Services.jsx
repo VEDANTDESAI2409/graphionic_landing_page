@@ -1,22 +1,14 @@
 import { useRef, useEffect } from 'react';
-import { ArrowRight, ChevronLeft, ChevronRight, Target, Users, Clock, Check } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SERVICES } from './ServiceFan';
-import { ENGAGEMENT_MODELS } from '../data/site';
-import { useInquiry } from '../context/Inquiry';
 import SpotlightCard from './react-bits/SpotlightCard';
-import BorderTrail from './react-bits/BorderTrail';
-import Magnet from './react-bits/Magnet';
+import EngagementModels from './EngagementModels';
 import { gsap, isReducedMotion } from '../utils/gsapConfig';
-
-const ICONS = { target: Target, users: Users, clock: Clock };
 
 export default function Services() {
   const sectionRef = useRef(null);
   const headRef = useRef(null);
   const track = useRef(null);
-  const engageHeadRef = useRef(null);
-  const engageGridRef = useRef(null);
-  const { openInquiry } = useInquiry();
 
   /* Gentle auto-advance on touch/mobile only. Any manual interaction
      (touch, wheel, drag, control click) pauses it permanently for the
@@ -107,58 +99,6 @@ export default function Services() {
           );
         }
       }
-
-      // Engagement section header
-      if (engageHeadRef.current) {
-        if (reduced) {
-          gsap.set(engageHeadRef.current, { opacity: 1, y: 0 });
-        } else {
-          gsap.fromTo(
-            engageHeadRef.current,
-            { opacity: 0, y: 26 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.8,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: engageHeadRef.current,
-                start: 'top 85%',
-                once: true,
-              },
-            }
-          );
-        }
-      }
-
-      // Engagement model cards
-      if (engageGridRef.current) {
-        const engageCards = engageGridRef.current.querySelectorAll('.engage-card');
-        if (reduced) {
-          gsap.set(engageCards, { opacity: 1, y: 0, scale: 1 });
-        } else {
-          gsap.fromTo(
-            engageCards,
-            { opacity: 0, y: 50, scale: 0.94 },
-            {
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              duration: 0.85,
-              ease: 'power3.out',
-              stagger: 0.12,
-              scrollTrigger: {
-                trigger: engageGridRef.current,
-                start: 'top 82%',
-                once: true,
-              },
-              onComplete: () => {
-                gsap.set(engageCards, { clearProps: 'transform' });
-              },
-            }
-          );
-        }
-      }
     }, sectionRef);
 
     return () => ctx.revert();
@@ -218,51 +158,8 @@ export default function Services() {
         <button onClick={() => nudge(1)} aria-label="Next services"><ChevronRight size={18} strokeWidth={2.4} /></button>
       </div>
 
-      {/* ---- how we engage ---- */}
-      <div className="shell engage">
-        <div className="sec-head engage-head" ref={engageHeadRef}>
-          <span className="pill"><span className="pdot" />Ways To Work Together</span>
-          <h2>
-            Choose Your <span className="b">Engagement Model</span>
-            <span className="acc">.</span>
-          </h2>
-          <p>Transparent scoping, a quote within 24 hours, and zero lock-in surprises.</p>
-        </div>
-
-        <div className="engage-grid" ref={engageGridRef}>
-          {ENGAGEMENT_MODELS.map((m, i) => {
-            const Ico = ICONS[m.icon] || Target;
-            const isFocal = i === 1;
-            return (
-              <SpotlightCard
-                key={m.title}
-                as="article"
-                className={`engage-card${isFocal ? ' is-focal' : ''}`}
-                spotlightColor={isFocal ? 'rgba(210, 255, 40, 0.16)' : 'rgba(0, 122, 255, 0.12)'}
-              >
-                {isFocal && <BorderTrail color="#D2FF28" size={140} duration={7} />}
-                {isFocal && <span className="engage-flag">Most popular</span>}
-                <span className="engage-ico"><Ico size={22} strokeWidth={2.1} /></span>
-                <h3>{m.title}</h3>
-                <p className="engage-desc">{m.desc}</p>
-                <ul>
-                  {m.points.map((pt) => (
-                    <li key={pt}><Check size={15} strokeWidth={2.6} />{pt}</li>
-                  ))}
-                </ul>
-                {m.price && <span className="engage-price">{m.price}</span>}
-                <span className="engage-best">Best for: {m.best}</span>
-                <Magnet magnetStrength={0.2} padding={20}>
-                  <button className={`btn ${isFocal ? 'btn-lime' : 'btn-dark'} engage-btn`} onClick={openInquiry}>
-                    Get a quote
-                    <span className="ico"><ArrowRight size={15} strokeWidth={2.4} /></span>
-                  </button>
-                </Magnet>
-              </SpotlightCard>
-            );
-          })}
-        </div>
-      </div>
+      {/* ---- how we engage (expandable cards redesign) ---- */}
+      <EngagementModels />
     </section>
   );
 }
