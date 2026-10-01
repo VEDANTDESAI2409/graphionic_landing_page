@@ -24,8 +24,8 @@ test.describe('Graphionic Infotech — Projects Orbit Showcase Verification', ()
     await expect(leftCard).toBeVisible();
     await expect(rightCard).toBeVisible();
 
-    // Verify pinned sticky viewport and showcase card elements
-    await expect(projectsSection.locator('.prj-sticky-viewport')).toBeVisible();
+    // Verify orbit navigation and showcase card elements
+    await expect(projectsSection.locator('.prj-orbit-nav')).toBeVisible();
     await expect(centerCard.locator('.prj-laptop-deck')).toBeVisible();
     await expect(centerCard.locator('.prj-card-title')).toBeVisible();
     await expect(centerCard.locator('.prj-card-badge')).toBeVisible();
@@ -39,9 +39,9 @@ test.describe('Graphionic Infotech — Projects Orbit Showcase Verification', ()
     const href = await ctaLink.getAttribute('href');
     expect(href).toMatch(/^https?:\/\//);
 
-    // Take screenshot of desktop showcase viewport
+    // Take screenshot of desktop showcase
     const desktopScreenshotPath = path.join(ARTIFACT_DIR, 'projects_showcase_desktop.png');
-    await projectsSection.locator('.prj-sticky-viewport').screenshot({ path: desktopScreenshotPath });
+    await projectsSection.screenshot({ path: desktopScreenshotPath });
 
     // Test clicking Next Arrow button
     const nextBtn = projectsSection.locator('.prj-arrow-btn[aria-label="Next project"]');
@@ -84,8 +84,8 @@ test.describe('Graphionic Infotech — Projects Orbit Showcase Verification', ()
     });
     expect(hasHorizontalOverflow).toBe(false);
 
-    // Take screenshot of mobile showcase viewport
+    // Take screenshot of mobile showcase
     const mobileScreenshotPath = path.join(ARTIFACT_DIR, 'projects_showcase_mobile.png');
-    await projectsSection.locator('.prj-sticky-viewport').screenshot({ path: mobileScreenshotPath });
+    await projectsSection.screenshot({ path: mobileScreenshotPath });
   });
 });
