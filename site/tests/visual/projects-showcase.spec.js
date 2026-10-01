@@ -41,7 +41,7 @@ test.describe('Graphionic Infotech — Projects Orbit Showcase Verification', ()
 
     // Take screenshot of desktop showcase
     const desktopScreenshotPath = path.join(ARTIFACT_DIR, 'projects_showcase_desktop.png');
-    await projectsSection.screenshot({ path: desktopScreenshotPath });
+    await projectsSection.locator('.prj-sticky-viewport').screenshot({ path: desktopScreenshotPath });
 
     // Test clicking Next Arrow button
     const nextBtn = projectsSection.locator('.prj-arrow-btn[aria-label="Next project"]');
@@ -52,6 +52,14 @@ test.describe('Graphionic Infotech — Projects Orbit Showcase Verification', ()
 
     const newTitle = await projectsSection.locator('.position-center .prj-card-title').textContent();
     expect(newTitle).not.toEqual(initialTitle);
+
+    // Test clicking orbit project number 03
+    const orbitBtn3 = projectsSection.locator('.prj-orbit-btn').nth(2);
+    await orbitBtn3.click();
+    await page.waitForTimeout(600);
+    const title3 = await projectsSection.locator('.position-center .prj-card-title').textContent();
+    expect(title3).toBe('Fastlane Freedom');
+    expect(await orbitBtn3.getAttribute('aria-selected')).toBe('true');
 
     // Test clicking pagination dot
     const dots = projectsSection.locator('.prj-page-dot');
@@ -86,6 +94,6 @@ test.describe('Graphionic Infotech — Projects Orbit Showcase Verification', ()
 
     // Take screenshot of mobile showcase
     const mobileScreenshotPath = path.join(ARTIFACT_DIR, 'projects_showcase_mobile.png');
-    await projectsSection.screenshot({ path: mobileScreenshotPath });
+    await projectsSection.locator('.prj-sticky-viewport').screenshot({ path: mobileScreenshotPath });
   });
 });
