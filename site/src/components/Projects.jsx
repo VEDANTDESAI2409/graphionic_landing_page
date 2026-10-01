@@ -1,15 +1,14 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useMotionValueEvent, useReducedMotion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ArrowRight, ShieldCheck, Zap, Users } from 'lucide-react';
 import { PROJECTS } from '../data/projects';
 import { useInquiry } from '../context/Inquiry';
-import { gsap, isReducedMotion } from '../utils/gsapConfig';
 
 const TECH_DOT_COLORS = ['#8B5CF6', '#007AFF', '#06B6D4', '#10B981', '#F59E0B'];
 
 function GitHubIcon({ className }) {
   return (
-    <svg className={className} width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -21,56 +20,88 @@ function GitHubIcon({ className }) {
 
 function renderMetricIcon(iconType, index) {
   if (iconType === 'shield' || index === 0) {
-    return <ShieldCheck size={18} strokeWidth={2.4} color="#007AFF" />;
+    return <ShieldCheck size={16} strokeWidth={2.4} color="#007AFF" />;
   }
   if (iconType === 'zap' || index === 1) {
-    return <Zap size={18} strokeWidth={2.4} color="#007AFF" />;
+    return <Zap size={16} strokeWidth={2.4} color="#007AFF" />;
   }
-  return <Users size={18} strokeWidth={2.4} color="#007AFF" />;
-}
-
-/**
- * Calculates coordinates along the curved orbit path
- * Path parameters in viewBox 0 0 180 520
- * Curve formula: Q 170 260 65 495 from 65 25
- */
-function getOrbitCoord(index, total) {
-  if (total <= 1) return { x: 120, y: 260 };
-  const t = index / (total - 1);
-  // Quadratic bezier: B(t) = (1-t)^2 * P0 + 2(1-t)t * P1 + t^2 * P2
-  const p0x = 65;
-  const p0y = 25;
-  const p1x = 170;
-  const p1y = 260;
-  const p2x = 65;
-  const p2y = 495;
-
-  const mt = 1 - t;
-  const x = mt * mt * p0x + 2 * mt * t * p1x + t * t * p2x;
-  const y = mt * mt * p0y + 2 * mt * t * p1y + t * t * p2y;
-  return { x: Math.round(x), y: Math.round(y) };
+  return <Users size={16} strokeWidth={2.4} color="#007AFF" />;
 }
 
 export default function Projects() {
-  const sectionRef = useRef(null);
-  const headRef = useRef(null);
-  // Default to index 2 (Project 03) matching the primary reference design
-  const [activeIndex, setActiveIndex] = useState(() => (PROJECTS.length > 2 ? 2 : 0));
-  const { openInquiry } = useInquiry();
+  const trackRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const isProgrammaticScroll = useRef(false);
+  const scrollTimeoutRef = useRef(null);
   const shouldReduceMotion = useReducedMotion();
+  const { openInquiry } = useInquiry();
   const total = PROJECTS.length;
 
+  // Track scroll progress through the pinned track
+  const { scrollYProgress } = useScroll({
+    target: trackRef,
+    offset: ['start start', 'end end'],
+  });
+
+  // Synchronize scroll progress with active project index
+  useMotionValueEvent(scrollYProgress, 'change', (progress) => {
+    if (isProgrammaticScroll.current) return;
+    if (total <= 1) return;
+
+    // Distribute projects evenly along the scroll track
+    const rawIdx = Math.round(progress * (total - 1));
+    const clamped = Math.min(total - 1, Math.max(0, rawIdx));
+    if (clamped !== activeIndex) {
+      setActiveIndex(clamped);
+    }
+  });
+
+  // Programmatic smooth scroll to specific project
+  const scrollToIndex = useCallback(
+    (targetIndex) => {
+      const clamped = Math.min(total - 1, Math.max(0, targetIndex));
+      setActiveIndex(clamped);
+
+      const track = trackRef.current;
+      if (!track) return;
+
+      isProgrammaticScroll.current = true;
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = setTimeout(() => {
+        isProgrammaticScroll.current = false;
+      }, 750);
+
+      const rect = track.getBoundingClientRect();
+      const scrollTop = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+      const trackTop = rect.top + scrollTop;
+      const availableScroll = track.offsetHeight - window.innerHeight;
+
+      if (availableScroll <= 0) return;
+
+      const progressRatio = total > 1 ? clamped / (total - 1) : 0;
+      const targetScrollY = Math.round(trackTop + progressRatio * availableScroll);
+
+      if (window.__lenis) {
+        window.__lenis.scrollTo(targetScrollY, {
+          duration: 0.75,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        });
+      } else {
+        window.scrollTo({ top: targetScrollY, behavior: 'smooth' });
+      }
+    },
+    [total]
+  );
+
   const handlePrev = useCallback(() => {
-    setActiveIndex((prev) => (prev - 1 + total) % total);
-  }, [total]);
+    const prev = activeIndex === 0 ? total - 1 : activeIndex - 1;
+    scrollToIndex(prev);
+  }, [activeIndex, total, scrollToIndex]);
 
   const handleNext = useCallback(() => {
-    setActiveIndex((prev) => (prev + 1) % total);
-  }, [total]);
-
-  const handleSelectProject = useCallback((index) => {
-    setActiveIndex(index);
-  }, []);
+    const next = activeIndex === total - 1 ? 0 : activeIndex + 1;
+    scrollToIndex(next);
+  }, [activeIndex, total, scrollToIndex]);
 
   // Keyboard navigation
   const handleKeyDown = useCallback(
@@ -100,37 +131,10 @@ export default function Projects() {
     }
   };
 
-  // GSAP scroll trigger entrance for the section header
   useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-
-    const ctx = gsap.context(() => {
-      const reduced = isReducedMotion();
-      if (headRef.current) {
-        if (reduced) {
-          gsap.set(headRef.current, { opacity: 1, y: 0 });
-        } else {
-          gsap.fromTo(
-            headRef.current,
-            { opacity: 0, y: 26 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.8,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: headRef.current,
-                start: 'top 85%',
-                once: true,
-              },
-            }
-          );
-        }
-      }
-    }, sectionRef);
-
-    return () => ctx.revert();
+    return () => {
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    };
   }, []);
 
   const activeProject = PROJECTS[activeIndex] || PROJECTS[0];
@@ -139,139 +143,59 @@ export default function Projects() {
   const prevProject = PROJECTS[prevIndex];
   const nextProject = PROJECTS[nextIndex];
 
-  return (
-    <section className="projects prj-showcase-section" id="projects" ref={sectionRef}>
-      {/* Ambient background glows and mesh dots */}
-      <div className="prj-bg-glow prj-bg-glow--tl" aria-hidden="true" />
-      <div className="prj-bg-glow prj-bg-glow--br" aria-hidden="true" />
-      <div className="prj-bg-dot prj-bg-dot--1" aria-hidden="true" />
-      <div className="prj-bg-dot prj-bg-dot--2" aria-hidden="true" />
+  // Dynamic pinned track height: ~70vh scroll headroom per transition
+  const trackHeightVh = Math.max(100, 100 + (total - 1) * 70);
 
-      <div className="shell prj-shell">
-        {/* Section Header */}
-        <div className="prj-header-center" ref={headRef}>
-          <div className="prj-eyebrow-pill">
-            <span className="prj-eyebrow-dot" />
-            <span className="prj-eyebrow-text">OUR PROJECTS</span>
+  return (
+    <section
+      className="projects prj-pinned-track"
+      id="projects"
+      ref={trackRef}
+      style={{ height: `${trackHeightVh}vh` }}
+    >
+      {/* Pinned Sticky Viewport */}
+      <div className="prj-sticky-viewport">
+        {/* Ambient background glows */}
+        <div className="prj-bg-glow prj-bg-glow--tl" aria-hidden="true" />
+        <div className="prj-bg-glow prj-bg-glow--br" aria-hidden="true" />
+        <div className="prj-bg-dot prj-bg-dot--1" aria-hidden="true" />
+        <div className="prj-bg-dot prj-bg-dot--2" aria-hidden="true" />
+
+        <div className="shell prj-shell prj-shell--compact">
+          {/* Section Header */}
+          <div className="prj-header-center">
+            <div className="prj-eyebrow-pill">
+              <span className="prj-eyebrow-dot" />
+              <span className="prj-eyebrow-text">OUR PROJECTS</span>
+            </div>
+
+            <h2 className="prj-heading">
+              What We’ve{' '}
+              <span className="prj-heading-accent">
+                Built
+                {/* Lime spark burst rays */}
+                <span className="prj-spark-rays" aria-hidden="true">
+                  <svg width="24" height="22" viewBox="0 0 28 26" fill="none">
+                    <path d="M7 21L1 25" stroke="#D2FF28" strokeWidth="3" strokeLinecap="round" />
+                    <path d="M14 15L12 3" stroke="#D2FF28" strokeWidth="3" strokeLinecap="round" />
+                    <path d="M21 17L27 11" stroke="#D2FF28" strokeWidth="3" strokeLinecap="round" />
+                  </svg>
+                </span>
+              </span>
+            </h2>
+
+            <p className="prj-subtitle">
+              A collection of real-world projects that showcase our expertise,
+              creativity and problem-solving approach.
+            </p>
           </div>
 
-          <h2 className="prj-heading">
-            What We’ve{' '}
-            <span className="prj-heading-accent">
-              Built
-              {/* Vibrant lime spark burst rays matching reference */}
-              <span className="prj-spark-rays" aria-hidden="true">
-                <svg width="28" height="26" viewBox="0 0 28 26" fill="none">
-                  <path d="M7 21L1 25" stroke="#D2FF28" strokeWidth="3" strokeLinecap="round" />
-                  <path d="M14 15L12 3" stroke="#D2FF28" strokeWidth="3" strokeLinecap="round" />
-                  <path d="M21 17L27 11" stroke="#D2FF28" strokeWidth="3" strokeLinecap="round" />
-                </svg>
-              </span>
-            </span>
-          </h2>
-
-          <p className="prj-subtitle">
-            A collection of real-world projects that showcase our expertise,
-            creativity and problem-solving approach.
-          </p>
-        </div>
-
-        {/* Mobile Horizontal Orbit Indicator Bar */}
-        <div className="prj-mobile-orbit-bar" role="tablist" aria-label="Mobile projects selector">
-          {PROJECTS.map((project, idx) => {
-            const isActive = idx === activeIndex;
-            const num = String(idx + 1).padStart(2, '0');
-            return (
-              <button
-                key={project.name}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                className={`prj-mobile-orbit-btn ${isActive ? 'is-active' : ''}`}
-                onClick={() => handleSelectProject(idx)}
-              >
-                <span className="prj-mobile-orbit-num">{num}</span>
-                {isActive && <span className="prj-mobile-orbit-dot" />}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Main Composition: Orbit Navigation + Central Showcase Stage */}
-        <div className="prj-layout-wrap">
-          {/* LEFT ORBIT NAVIGATION */}
-          <nav className="prj-orbit-nav" aria-label="Projects orbit navigation">
-            <svg
-              className="prj-orbit-svg"
-              viewBox="0 0 180 520"
-              fill="none"
-              preserveAspectRatio="none"
-              aria-hidden="true"
-            >
-              {/* Thin light-blue curved orbit path */}
-              <path
-                d="M 65 25 Q 170 260 65 495"
-                className="prj-orbit-path"
-              />
-
-              {/* Orbit Nodes placed along curve */}
-              {PROJECTS.map((p, i) => {
-                const { x, y } = getOrbitCoord(i, total);
-                const isActive = i === activeIndex;
-                return (
-                  <g
-                    key={p.name}
-                    className={`prj-orbit-svg-node ${isActive ? 'is-active' : ''}`}
-                    onClick={() => handleSelectProject(i)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {isActive ? (
-                      <>
-                        <circle cx={x} cy={y} r="15" className="prj-orbit-node-aura" />
-                        <circle cx={x} cy={y} r="8" className="prj-orbit-node-outer" />
-                        <circle cx={x} cy={y} r="4.5" className="prj-orbit-node-inner" />
-                      </>
-                    ) : (
-                      <circle cx={x} cy={y} r="4" className="prj-orbit-node-circle" />
-                    )}
-                  </g>
-                );
-              })}
-            </svg>
-
-            {/* Orbit Numbers and Project Labels */}
-            <div className="prj-orbit-items">
-              {PROJECTS.map((project, index) => {
-                const isActive = index === activeIndex;
-                const num = String(index + 1).padStart(2, '0');
-                const { x, y } = getOrbitCoord(index, total);
-
-                return (
-                  <button
-                    key={project.name}
-                    type="button"
-                    className={`prj-orbit-btn ${isActive ? 'is-active' : ''}`}
-                    onClick={() => handleSelectProject(index)}
-                    style={{ top: `${y}px`, right: `${180 - x + 16}px` }}
-                    aria-label={`Select project ${num}: ${project.name}`}
-                    aria-pressed={isActive}
-                  >
-                    <span className="prj-orbit-num">{num}</span>
-                    <span className="prj-orbit-label">
-                      {project.shortName || project.name}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </nav>
-
-          {/* MAIN SHOWCASE STAGE */}
+          {/* Centered Showcase Stage with Depth Cards & Arrows */}
           <div
             className="prj-stage-area"
             tabIndex={0}
             role="region"
-            aria-label="Projects showcase carousel"
+            aria-label="Pinned projects showcase"
             onKeyDown={handleKeyDown}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
@@ -283,7 +207,7 @@ export default function Projects() {
               onClick={handlePrev}
               aria-label="Previous project"
             >
-              <ChevronLeft size={22} strokeWidth={2.4} />
+              <ChevronLeft size={20} strokeWidth={2.4} />
             </button>
 
             {/* Circular Floating Arrow: Next */}
@@ -293,7 +217,7 @@ export default function Projects() {
               onClick={handleNext}
               aria-label="Next project"
             >
-              <ChevronRight size={22} strokeWidth={2.4} />
+              <ChevronRight size={20} strokeWidth={2.4} />
             </button>
 
             {/* Previous Project Card Peeking in Background (Left) */}
@@ -331,177 +255,154 @@ export default function Projects() {
             </aside>
 
             {/* MAIN ACTIVE PROJECT SHOWCASE CARD */}
-            <motion.article
-              key={activeProject.name}
-              className="prj-showcase-card position-center is-active"
-              initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-            >
-              {/* Card Left: Laptop Mockup Presentation */}
-              <div className="prj-card-visual-col">
-                <div className="prj-laptop-deck">
-                  <div className="prj-laptop-screen">
-                    <div className="prj-laptop-webcam" />
-                    <div className="prj-laptop-display">
-                      <img
-                        src={activeProject.image}
-                        alt={activeProject.name}
-                        className="prj-laptop-img prj-card-img"
-                        loading="eager"
-                      />
-                      <div className="prj-laptop-glass-glare" />
-                    </div>
-                  </div>
-                  <div className="prj-laptop-base">
-                    <div className="prj-laptop-notch" />
-                  </div>
-                  <div className="prj-laptop-shadow" />
-                </div>
-              </div>
-
-              {/* Card Right: Project Information */}
-              <div className="prj-card-info-col">
-                {/* Centered Indicator Dots for compatibility */}
-                <div className="prj-card-dots" aria-hidden="true" style={{ display: 'none' }}>
-                  <span className="prj-card-dot is-active" />
-                  <span className="prj-card-dot" />
-                  <span className="prj-card-dot" />
-                </div>
-
-                {/* Header row: Category pill badge & index counter */}
-                <div className="prj-info-meta-row">
-                  <span className="prj-category-pill prj-card-badge">
-                    {activeProject.category || 'WEB APPLICATION'}
-                  </span>
-                  <span
-                    className="prj-counter-fraction"
-                    aria-label={`Project ${activeIndex + 1} of ${total}`}
-                  >
-                    {String(activeIndex + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
-                  </span>
-                </div>
-
-                {/* Project Title */}
-                <h3 className="prj-main-title prj-card-title">{activeProject.name}</h3>
-
-                {/* Project Description */}
-                <p className="prj-main-desc prj-card-desc">{activeProject.description}</p>
-
-                {/* Technology Pills */}
-                <div className="prj-tech-pills prj-card-tags" aria-label="Technologies used">
-                  {activeProject.tech.map((techItem, tIdx) => {
-                    const dotColor = TECH_DOT_COLORS[tIdx % TECH_DOT_COLORS.length];
-                    return (
-                      <span key={techItem} className="prj-tech-pill prj-card-tag">
-                        <span className="prj-tech-dot" style={{ backgroundColor: dotColor }} />
-                        <span>{techItem}</span>
-                      </span>
-                    );
-                  })}
-                </div>
-
-                {/* Subtle Divider */}
-                <div className="prj-info-divider" />
-
-                {/* 3 Concise Metrics Row */}
-                {activeProject.metrics && activeProject.metrics.length > 0 && (
-                  <div className="prj-metrics-grid">
-                    {activeProject.metrics.map((metric, mIdx) => (
-                      <div key={mIdx} className="prj-metric-cell">
-                        <div className="prj-metric-top">
-                          <span className="prj-metric-ico">
-                            {renderMetricIcon(metric.icon, mIdx)}
-                          </span>
-                          <span className="prj-metric-val">{metric.value}</span>
-                        </div>
-                        <span className="prj-metric-label">{metric.label}</span>
+            <AnimatePresence mode="wait">
+              <motion.article
+                key={activeProject.name}
+                className="prj-showcase-card position-center is-active"
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 12, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={shouldReduceMotion ? false : { opacity: 0, y: -10, scale: 0.98 }}
+                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              >
+                {/* Card Left: Laptop Mockup Presentation */}
+                <div className="prj-card-visual-col">
+                  <div className="prj-laptop-deck">
+                    <div className="prj-laptop-screen">
+                      <div className="prj-laptop-webcam" />
+                      <div className="prj-laptop-display">
+                        <img
+                          src={activeProject.image}
+                          alt={activeProject.name}
+                          className="prj-laptop-img prj-card-img"
+                          loading="eager"
+                        />
+                        <div className="prj-laptop-glass-glare" />
                       </div>
-                    ))}
+                    </div>
+                    <div className="prj-laptop-base">
+                      <div className="prj-laptop-notch" />
+                    </div>
+                    <div className="prj-laptop-shadow" />
                   </div>
-                )}
+                </div>
 
-                {/* CTA Buttons Row */}
-                <div className="prj-actions-row">
-                  <a
-                    href={activeProject.url || '#'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="prj-btn-primary prj-card-cta"
-                  >
-                    <span>View Project</span>
-                    <ArrowRight size={17} strokeWidth={2.4} className="prj-btn-arrow" />
-                  </a>
+                {/* Card Right: Project Information */}
+                <div className="prj-card-info-col">
+                  {/* Category pill badge & index counter */}
+                  <div className="prj-info-meta-row">
+                    <span className="prj-category-pill prj-card-badge">
+                      {activeProject.category || 'WEB APPLICATION'}
+                    </span>
+                    <span
+                      className="prj-counter-fraction"
+                      aria-label={`Project ${activeIndex + 1} of ${total}`}
+                    >
+                      {String(activeIndex + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
+                    </span>
+                  </div>
 
-                  {activeProject.githubUrl ? (
+                  {/* Project Title */}
+                  <h3 className="prj-main-title prj-card-title">{activeProject.name}</h3>
+
+                  {/* Project Description */}
+                  <p className="prj-main-desc prj-card-desc">{activeProject.description}</p>
+
+                  {/* Technology Pills */}
+                  <div className="prj-tech-pills prj-card-tags" aria-label="Technologies used">
+                    {activeProject.tech.map((techItem, tIdx) => {
+                      const dotColor = TECH_DOT_COLORS[tIdx % TECH_DOT_COLORS.length];
+                      return (
+                        <span key={techItem} className="prj-tech-pill prj-card-tag">
+                          <span className="prj-tech-dot" style={{ backgroundColor: dotColor }} />
+                          <span>{techItem}</span>
+                        </span>
+                      );
+                    })}
+                  </div>
+
+                  {/* Subtle Divider */}
+                  <div className="prj-info-divider" />
+
+                  {/* 3 Concise Metrics Row */}
+                  {activeProject.metrics && activeProject.metrics.length > 0 && (
+                    <div className="prj-metrics-grid">
+                      {activeProject.metrics.map((metric, mIdx) => (
+                        <div key={mIdx} className="prj-metric-cell">
+                          <div className="prj-metric-top">
+                            <span className="prj-metric-ico">
+                              {renderMetricIcon(metric.icon, mIdx)}
+                            </span>
+                            <span className="prj-metric-val">{metric.value}</span>
+                          </div>
+                          <span className="prj-metric-label">{metric.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* CTA Buttons Row */}
+                  <div className="prj-actions-row">
                     <a
-                      href={activeProject.githubUrl}
+                      href={activeProject.url || '#'}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="prj-btn-secondary"
-                      aria-label={`View ${activeProject.name} on GitHub`}
+                      className="prj-btn-primary prj-card-cta"
                     >
-                      <GitHubIcon className="prj-github-icon" />
-                      <span>GitHub</span>
+                      <span>View Project</span>
+                      <ArrowRight size={16} strokeWidth={2.4} className="prj-btn-arrow" />
                     </a>
-                  ) : (
-                    <button
-                      type="button"
-                      className="prj-btn-secondary"
-                      onClick={openInquiry}
-                    >
-                      <span>Inquire</span>
-                    </button>
-                  )}
+
+                    {activeProject.githubUrl ? (
+                      <a
+                        href={activeProject.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="prj-btn-secondary"
+                        aria-label={`View ${activeProject.name} on GitHub`}
+                      >
+                        <GitHubIcon className="prj-github-icon" />
+                        <span>GitHub</span>
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        className="prj-btn-secondary"
+                        onClick={openInquiry}
+                      >
+                        <span>Inquire</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </motion.article>
-          </div>
-        </div>
-
-        {/* Bottom Pagination Indicators */}
-        <div className="prj-bottom-pagination">
-          <div
-            className="prj-pagination"
-            role="tablist"
-            aria-label="Project slider indicators"
-          >
-            {PROJECTS.map((project, idx) => (
-              <button
-                key={project.name}
-                type="button"
-                role="tab"
-                aria-selected={idx === activeIndex}
-                aria-label={`Jump to ${project.name}`}
-                className={`prj-page-dot ${idx === activeIndex ? 'is-active' : ''}`}
-                onClick={() => handleSelectProject(idx)}
-              />
-            ))}
+              </motion.article>
+            </AnimatePresence>
           </div>
 
-          {/* Mobile swipe affordance indicator */}
-          <p className="prj-swipe" aria-hidden="true">
-            <i /> Swipe to explore projects <i />
-          </p>
-        </div>
+          {/* Bottom Pagination Indicators */}
+          <div className="prj-bottom-pagination">
+            <div
+              className="prj-pagination"
+              role="tablist"
+              aria-label="Project slider indicators"
+            >
+              {PROJECTS.map((project, idx) => (
+                <button
+                  key={project.name}
+                  type="button"
+                  role="tab"
+                  aria-selected={idx === activeIndex}
+                  aria-label={`Jump to project ${idx + 1}: ${project.name}`}
+                  className={`prj-page-dot ${idx === activeIndex ? 'is-active' : ''}`}
+                  onClick={() => scrollToIndex(idx)}
+                />
+              ))}
+            </div>
 
-        {/* Decorative bottom curved arrow flourish */}
-        <div className="prj-decorative-arrow" aria-hidden="true">
-          <svg width="110" height="42" viewBox="0 0 110 42" fill="none">
-            <path
-              d="M 10 32 C 45 42, 80 26, 102 10"
-              stroke="#93C5FD"
-              strokeWidth="1.8"
-              strokeDasharray="4 4"
-            />
-            <path
-              d="M 94 9 L 103 9 L 102 18"
-              stroke="#93C5FD"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+            {/* Mobile swipe affordance indicator */}
+            <p className="prj-swipe" aria-hidden="true">
+              <i /> Swipe to explore projects <i />
+            </p>
+          </div>
         </div>
       </div>
     </section>
