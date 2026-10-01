@@ -647,37 +647,6 @@ img { max-width: 100%; display: block; }
 .fan-scroll { display: none; }
 
 /* ============================================================
-   TECH MARQUEE
-   ============================================================ */
-.tech {
-  background: #fff;
-  padding: 34px 0 30px;
-  overflow: hidden;
-  position: relative;
-}
-.tech::before, .tech::after {
-  content: ''; position: absolute; top: 0; bottom: 0; width: 120px; z-index: 3; pointer-events: none;
-}
-.tech::before { left: 0; background: linear-gradient(90deg, #fff 10%, rgba(255,255,255,0)); }
-.tech::after { right: 0; background: linear-gradient(270deg, #fff 10%, rgba(255,255,255,0)); }
-.marquee { display: flex; width: max-content; }
-.marquee-row {
-  display: flex; align-items: center;
-  animation: slide 34s linear infinite;
-}
-.tech:hover .marquee-row { animation-play-state: paused; }
-@keyframes slide { from { transform: translateX(0); } to { transform: translateX(-100%); } }
-.tech-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 0 52px;
-  color: var(--gray-900);
-  font-size: 17px; font-weight: 600; letter-spacing: -0.01em;
-  white-space: nowrap;
-}
-.tech-sep { width: 1px; height: 26px; background: var(--gray-200); flex: none; }
-.tech-item svg { flex: none; }
-
-/* ============================================================
    ABOUT
    ============================================================ */
 .about { padding: 96px 0 76px; text-align: center; background: #fff; }
@@ -2688,8 +2657,9 @@ img { max-width: 100%; display: block; }
    ============================================================ */
 .engage-section {
   position: relative;
-  margin-top: 84px;
+  margin-top: 16px;
   padding: 10px 0 30px;
+  overflow: hidden;
 }
 
 /* Background Ambient Orbs and Grid */
@@ -3637,102 +3607,6 @@ img { max-width: 100%; display: block; }
 .prj-metric span { font-size: 12.5px; font-weight: 600; color: var(--gray-600); line-height: 1.35; }
 
 /* ============================================================
-   SERVICES SECTION — horizontal card strip (restored styles)
-   ============================================================ */
-.services {
-  padding: 46px 0 20px;
-  overflow: hidden;
-}
-.services .sec-head h2 .b { color: var(--blue); }
-
-.srv-shell { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
-.srv-shell::-webkit-scrollbar { display: none; }
-
-.srv-track {
-  display: flex;
-  gap: 16px;
-  padding: 26px 24px 30px;
-  scroll-snap-type: x proximity;
-}
-
-.srv {
-  position: relative;
-  flex: 0 0 260px;
-  min-height: 236px;
-  scroll-snap-align: start;
-  background: #fff;
-  border: 1px solid var(--gray-200);
-  border-radius: var(--r-md);
-  padding: 24px 22px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  box-shadow: var(--shadow-soft);
-  cursor: pointer;
-  overflow: hidden;
-  transition: transform 0.35s cubic-bezier(.22,1,.36,1), box-shadow 0.35s ease, border-color 0.35s ease;
-}
-.srv:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-card);
-  border-color: rgba(0, 122, 255, 0.28);
-}
-.srv h3 {
-  position: relative; z-index: 2;
-  font-size: 20px; font-weight: 800; letter-spacing: -0.02em;
-  color: var(--ink); line-height: 1.22;
-}
-.srv-ico {
-  position: relative; z-index: 2;
-  width: 46px; height: 46px; border-radius: 13px;
-  display: grid; place-items: center;
-}
-.srv-num {
-  position: absolute; top: 14px; right: 18px; z-index: 1;
-  font-size: 52px; font-weight: 800; letter-spacing: -0.04em;
-  color: var(--gray-100);
-  user-select: none; pointer-events: none;
-}
-.srv-rule {
-  position: relative; z-index: 2;
-  width: 34px; height: 3px; border-radius: 99px; margin-top: auto;
-}
-.srv-go {
-  position: absolute; right: 16px; bottom: 16px; z-index: 2;
-  width: 36px; height: 36px; border-radius: 50%;
-  display: grid; place-items: center;
-  background: var(--gray-100); color: var(--ink);
-  opacity: 0;
-  transform: translateX(-4px);
-  transition: opacity 0.3s ease, transform 0.3s ease, background 0.3s ease, color 0.3s ease;
-}
-.srv:hover .srv-go, .srv:focus-visible .srv-go {
-  opacity: 1; transform: none;
-  background: var(--navy); color: #fff;
-}
-
-.srv-ctrls {
-  display: flex; justify-content: flex-end; align-items: center;
-  gap: 10px; padding: 0 24px;
-}
-.srv-ctrls button {
-  width: 42px; height: 42px; border-radius: 50%;
-  border: 1px solid var(--gray-200);
-  background: #fff; color: var(--ink);
-  display: grid; place-items: center; cursor: pointer;
-  box-shadow: var(--shadow-soft);
-  transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-.srv-ctrls button:hover {
-  transform: translateY(-2px);
-  background: var(--navy); color: #fff;
-  border-color: var(--navy);
-}
-@media (prefers-reduced-motion: reduce) {
-  .srv, .srv-go, .srv-ctrls button { transition: none; }
-}
-
-/* ============================================================
    REACT BITS INTERACTION SYSTEM & SECTION ENHANCEMENTS
    ============================================================ */
 
@@ -3888,105 +3762,6 @@ img { max-width: 100%; display: block; }
 /* 8. Scroll Reveal Words */
 .scroll-reveal-words {
   display: inline;
-}
-
-/* 9. Interactive Tech Ecosystem */
-.tech-eco {
-  margin-top: 24px;
-  padding: 0 40px;
-}
-.tech-nodes-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.tech-node-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: var(--gray-50);
-  border: 1px solid var(--gray-200);
-  border-radius: 99px;
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--gray-700);
-  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-  cursor: pointer;
-}
-.tech-node-btn:hover, .tech-node-btn.is-active {
-  background: var(--navy);
-  border-color: var(--navy);
-  color: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px -6px rgba(10, 15, 29, 0.25);
-}
-.tech-node-btn.is-active {
-  border-color: var(--lime);
-}
-.tech-node-btn.is-active .tech-node-badge {
-  background: var(--lime);
-  color: var(--navy);
-}
-.tech-node-badge {
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 99px;
-  background: var(--gray-200);
-  color: var(--gray-600);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  transition: all 0.25s ease;
-}
-.tech-detail-card {
-  max-width: 680px;
-  margin: 0 auto;
-  background: #ffffff;
-  border: 1px solid var(--gray-200);
-  border-radius: var(--r-md);
-  padding: 20px 26px;
-  box-shadow: var(--shadow-soft);
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
-  transition: all 0.3s ease;
-}
-.tech-detail-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: var(--gray-100);
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-}
-.tech-detail-content h4 {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--navy);
-  margin-bottom: 4px;
-}
-.tech-detail-content p {
-  font-size: 13.5px;
-  line-height: 1.5;
-  color: var(--gray-600);
-  margin-bottom: 10px;
-}
-.tech-caps-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.tech-cap-pill {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 3px 9px;
-  border-radius: 6px;
-  background: var(--gray-100);
-  color: var(--gray-700);
 }
 
 /* 10. Interactive Process Timeline */
@@ -4307,7 +4082,7 @@ img { max-width: 100%; display: block; }
   .aurora-blob, .border-trail-beam, .shiny-text {
     animation: none !important;
   }
-  .prj-card-img, .prj-card-item, .rev-card, .tech-node-btn {
+  .prj-card-img, .prj-card-item, .rev-card {
     transition: none !important;
   }
 }

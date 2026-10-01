@@ -2,11 +2,10 @@ import { InquiryProvider } from './context/Inquiry';
 import SmoothScroll from './context/SmoothScroll';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import TechMarquee from './components/TechMarquee';
 import About from './components/About';
 import Stats from './components/Stats';
 import Experience from './components/Experience';
-import Services from './components/Services';
+import EngagementModels from './components/EngagementModels';
 import Projects from './components/Projects';
 import WhyGraphionic from './components/WhyGraphionic';
 import Reviews from './components/Reviews';
@@ -41,12 +40,11 @@ export default function App() {
           <Navbar />
           <main>
             {/* 1 */} <Hero />
-            {/* 2 */} <TechMarquee />
-            {/* 3 */} <About />
-            {/* 4 */} <Stats />
-            {/* 5 */} <Experience />
-            {/* 6 */} <Services />
-            {/* 7 */} <Projects />
+            {/* 2 */} <About />
+            {/* 3 */} <Stats />
+            {/* 4 */} <Experience />
+            {/* 5 */} <EngagementModels />
+            {/* 6 */} <Projects />
             {/* 8 */} <WhyGraphionic />
             {/* 9 */} <Reviews />
             {/* 10 */} <Faq />
