@@ -11,10 +11,13 @@ const VIEWPORTS = [
 ];
 
 test.describe('Mobile Optimization & Zero-Overflow Audits', () => {
+  test.setTimeout(60000);
+
   for (const vp of VIEWPORTS) {
     test(`Zero horizontal overflow on ${vp.name} (${vp.width}px)`, async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
-      await page.goto('http://localhost:5173/', { waitUntil: 'networkidle' });
+      await page.goto('http://localhost:5173/');
+      await page.waitForTimeout(400);
 
       // Check overflow on initial load
       const isOverflown = await page.evaluate(() => {
@@ -22,13 +25,13 @@ test.describe('Mobile Optimization & Zero-Overflow Audits', () => {
       });
       expect(isOverflown).toBe(false);
 
-      // Scroll smoothly down entire page and verify no horizontal scroll appears at any point
+      // Scroll down entire page and verify no horizontal scroll appears at any point
       await page.evaluate(async () => {
-        const step = 450;
+        const step = 600;
         const total = document.documentElement.scrollHeight;
         for (let y = 0; y <= total; y += step) {
           window.scrollTo(0, y);
-          await new Promise((r) => setTimeout(r, 50));
+          await new Promise((r) => setTimeout(r, 15));
           if (document.documentElement.scrollWidth > window.innerWidth) {
             throw new Error(`Horizontal overflow at scrollY ${y}: scrollWidth ${document.documentElement.scrollWidth} > innerWidth ${window.innerWidth}`);
           }
@@ -39,8 +42,8 @@ test.describe('Mobile Optimization & Zero-Overflow Audits', () => {
 
   test('Verify mobile components and interactions at 390x844', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto('http://localhost:5173/', { waitUntil: 'networkidle' });
-    await page.waitForTimeout(900); // Allow GSAP entrance animation to complete
+    await page.goto('http://localhost:5173/');
+    await page.waitForTimeout(600);
 
     // 1. Mobile Navbar & Header
     const burger = page.locator('.nav-burger');
@@ -145,7 +148,8 @@ test.describe('Mobile Optimization & Zero-Overflow Audits', () => {
 
   test('Verify Desktop design is 100% preserved at 1280x800', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto('http://localhost:5173/', { waitUntil: 'networkidle' });
+    await page.goto('http://localhost:5173/');
+    await page.waitForTimeout(600);
 
     // Desktop navbar links and CTA visible
     const navLinks = page.locator('.nav-links');

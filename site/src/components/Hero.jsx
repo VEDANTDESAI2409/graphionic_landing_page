@@ -19,6 +19,14 @@ export default function Hero() {
     if (isReducedMotion()) return;
 
     const ctx = gsap.context(() => {
+      if (window.innerWidth <= 768) {
+        gsap.set(['.hero-eyebrow', '.hero-h1', '.hero-sub', '.hero-ctas .btn'], {
+          opacity: 1,
+          y: 0,
+        });
+        return;
+      }
+
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
       // 1. Small hero eyebrow/badge appears first

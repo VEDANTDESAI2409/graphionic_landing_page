@@ -936,13 +936,13 @@ img { max-width: 100%; display: block; }
 
 @media (max-width: 768px) {
   .about.about-track {
-    min-height: 135vh;
+    min-height: 118vh;
     padding: 0;
   }
   .about-sticky-stage {
     top: 60px;
     height: calc(100dvh - 60px);
-    padding: 30px 0 20px;
+    padding: 24px 0 16px;
   }
   .about-br {
     display: none;
@@ -5347,9 +5347,9 @@ img { max-width: 100%; display: block; }
   /* ---- 4. Mobile Engagement Models Pinned Stack per requirement #5 ---- */
   .engage-mobile-pinned-track {
     position: relative !important;
-    min-height: 250vh !important;
+    min-height: 165vh !important;
     padding: 0 !important;
-    margin-top: 20px !important;
+    margin-top: 16px !important;
   }
   .engage-mobile-sticky-stage {
     position: sticky !important;
