@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { Star, ArrowUpRight, MapPin, Users, ThumbsUp } from 'lucide-react';
 import { GOOGLE, COMPANY } from '../data/site';
+import useIsMobile from '../hooks/useIsMobile';
 import SpotlightCard from './react-bits/SpotlightCard';
 import Magnet from './react-bits/Magnet';
 import { gsap, isReducedMotion } from '../utils/gsapConfig';
@@ -89,6 +90,8 @@ export default function Reviews() {
     return () => ctx.revert();
   }, []);
 
+  const isMobile = useIsMobile();
+
   return (
     <section className="reviews" id="reviews" ref={sectionRef}>
       <div className="shell">
@@ -116,31 +119,33 @@ export default function Reviews() {
           </a>
         </div>
 
-        {/* ---- Interactive Client Testimonials Grid ---- */}
-        <div className="reviews-interactive-grid">
-          {CLIENT_TESTIMONIALS.map((t) => (
-            <SpotlightCard
-              key={t.project}
-              as="article"
-              className="rev-card"
-              spotlightColor="rgba(0, 122, 255, 0.12)"
-            >
-              <div className="rev-stars" style={{ marginBottom: '14px' }}>
-                {[0, 1, 2, 3, 4].map((i) => (
-                  <Star key={i} size={15} fill="#FFCE1F" color="#F2B705" strokeWidth={1.5} />
-                ))}
-              </div>
-              <p className="rev-card-quote">&ldquo;{t.quote}&rdquo;</p>
-              <div className="rev-card-author">
-                <div className="rev-author-av">{t.author.charAt(0)}</div>
-                <div className="rev-author-info">
-                  <strong>{t.author}</strong>
-                  <span>{t.role} &middot; {t.project}</span>
+        {/* ---- Client Testimonials Grid (Desktop only - removed on mobile per requirement #7) ---- */}
+        {!isMobile && (
+          <div className="reviews-interactive-grid">
+            {CLIENT_TESTIMONIALS.map((t) => (
+              <SpotlightCard
+                key={t.project}
+                as="article"
+                className="rev-card"
+                spotlightColor="rgba(0, 122, 255, 0.12)"
+              >
+                <div className="rev-stars" style={{ marginBottom: '14px' }}>
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <Star key={i} size={15} fill="#FFCE1F" color="#F2B705" strokeWidth={1.5} />
+                  ))}
                 </div>
-              </div>
-            </SpotlightCard>
-          ))}
-        </div>
+                <p className="rev-card-quote">&ldquo;{t.quote}&rdquo;</p>
+                <div className="rev-card-author">
+                  <div className="rev-author-av">{t.author.charAt(0)}</div>
+                  <div className="rev-author-info">
+                    <strong>{t.author}</strong>
+                    <span>{t.role} &middot; {t.project}</span>
+                  </div>
+                </div>
+              </SpotlightCard>
+            ))}
+          </div>
+        )}
 
         <div className="rev-place">
           <MapPin size={17} strokeWidth={2.2} />

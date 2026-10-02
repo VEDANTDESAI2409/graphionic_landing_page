@@ -59,7 +59,7 @@ export default function FinalCta() {
 
     const ctx = gsap.context(() => {
       const reduced = isReducedMotion();
-      if (reduced) {
+      if (reduced || window.innerWidth <= 768) {
         gsap.set(card, { opacity: 1, y: 0, scale: 1 });
         return;
       }

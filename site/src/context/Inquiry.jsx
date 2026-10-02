@@ -1,11 +1,19 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
-const Ctx = createContext({ open: false, openInquiry: () => {}, closeInquiry: () => {} });
+const Ctx = createContext({ open: false, initialType: '', openInquiry: () => {}, closeInquiry: () => {} });
 
 export function InquiryProvider({ children }) {
   const [open, setOpen] = useState(false);
-  const openInquiry = useCallback(() => setOpen(true), []);
-  const closeInquiry = useCallback(() => setOpen(false), []);
+  const [initialType, setInitialType] = useState('');
+  const openInquiry = useCallback((type) => {
+    if (typeof type === 'string') setInitialType(type);
+    else setInitialType('');
+    setOpen(true);
+  }, []);
+  const closeInquiry = useCallback(() => {
+    setOpen(false);
+    setInitialType('');
+  }, []);
 
   // lock body scroll while the modal is open
   useEffect(() => {
@@ -30,7 +38,7 @@ export function InquiryProvider({ children }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  return <Ctx.Provider value={{ open, openInquiry, closeInquiry }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ open, initialType, openInquiry, closeInquiry }}>{children}</Ctx.Provider>;
 }
 
 export const useInquiry = () => useContext(Ctx);

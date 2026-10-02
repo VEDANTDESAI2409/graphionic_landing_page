@@ -121,12 +121,14 @@ export default function Navbar() {
             ))}
           </nav>
 
-          <Magnet magnetStrength={0.2} padding={20}>
-            <button className="nav-cta" onClick={openInquiry}>
-              Start Your Project
-              <ArrowRight size={16} strokeWidth={2.6} />
-            </button>
-          </Magnet>
+          <div className="nav-cta-wrap">
+            <Magnet magnetStrength={0.2} padding={20}>
+              <button className="nav-cta" onClick={openInquiry}>
+                Start Your Project
+                <ArrowRight size={16} strokeWidth={2.6} />
+              </button>
+            </Magnet>
+          </div>
 
           <button
             className="nav-burger"

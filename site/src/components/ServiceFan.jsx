@@ -82,13 +82,13 @@ function getCurveParams(p, viewportWidth) {
   const isMobile = viewportWidth <= 540;
 
   // Horizontal spacing between adjacent card centers
-  const xSpacing = isDesktop ? 222 : isLaptop ? 176 : isTablet ? 120 : 82;
+  const xSpacing = isDesktop ? 222 : isLaptop ? 176 : isTablet ? 120 : 66;
   // Arc drop factor
-  const yFactor = isDesktop ? 15.5 : isLaptop ? 13.5 : isTablet ? 11 : 8.5;
+  const yFactor = isDesktop ? 15.5 : isLaptop ? 13.5 : isTablet ? 11 : 6.5;
   // Fan rotation degrees per slot
-  const rotFactor = isDesktop ? 5.8 : isLaptop ? 5.0 : isTablet ? 4.2 : 3.5;
+  const rotFactor = isDesktop ? 5.8 : isLaptop ? 5.0 : isTablet ? 4.2 : 2.8;
   // 3D perspective rotation (curving inwards toward camera)
-  const rotYFactor = isDesktop ? -4.5 : isLaptop ? -3.8 : isTablet ? -2.6 : -1.8;
+  const rotYFactor = isDesktop ? -4.5 : isLaptop ? -3.8 : isTablet ? -2.6 : -1.5;
 
   const absP = Math.abs(p);
 
@@ -97,19 +97,22 @@ function getCurveParams(p, viewportWidth) {
   const rotateZ = p * rotFactor;
   const rotateY = p * rotYFactor;
 
-  // Scale: Center focal card (p=0) is largest and prominent
-  const scaleStep = isDesktop ? 0.11 : isLaptop ? 0.10 : isTablet ? 0.09 : 0.08;
-  const scale = Math.max(0.72, 1.08 - absP * scaleStep);
+  // Scale: Center focal card (p=0) is largest and prominent, balanced on mobile
+  const scale = isMobile
+    ? (absP === 0 ? 1.0 : Math.max(0.68, 0.85 - (absP - 1) * 0.15))
+    : Math.max(0.72, 1.08 - absP * (isDesktop ? 0.11 : isLaptop ? 0.10 : 0.09));
 
   // Elevation hierarchy: Apex center card highest (z=10), flanking cards lower
   const zIndex = Math.max(1, Math.round(10 - absP * 2.5));
 
-  // Opacity: full for visible 5 cards, tailored for mobile viewports
+  // Opacity: full for center card, tailored depth for mobile viewports
   let opacity = 1;
   if (absP > 2.3) {
     opacity = 0;
   } else if (absP > 1.8) {
-    opacity = isMobile ? 0.35 : isTablet ? 0.75 : 0.92;
+    opacity = isMobile ? 0.28 : isTablet ? 0.75 : 0.92;
+  } else if (absP > 0.8) {
+    opacity = isMobile ? 0.88 : 1;
   }
 
   return { x, y, rotateZ, rotateY, scale, zIndex, opacity };

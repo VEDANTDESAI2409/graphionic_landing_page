@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, CheckCircle2 } from 'lucide-react';
+import useIsMobile from '../hooks/useIsMobile';
 import { gsap, isReducedMotion } from '../utils/gsapConfig';
 
 /* dotted-globe: latitude/longitude dot lattice projected onto a sphere */
@@ -125,6 +126,7 @@ const PROCESS_STEPS = [
 
 export default function Experience() {
   const [activeStep, setActiveStep] = useState(0);
+  const isMobile = useIsMobile();
   const wrapRef = useRef(null);
   const cardRef = useRef(null);
   const titleRef = useRef(null);
@@ -274,72 +276,93 @@ export default function Experience() {
             </p>
           </div>
 
-          <div className="process-steps-nav" role="tablist" aria-label="Process steps">
-            <div className="process-nav-line">
-              <div
-                className="process-nav-fill"
-                style={{ width: `${(activeStep / (PROCESS_STEPS.length - 1)) * 100}%` }}
-              />
+          {isMobile ? (
+            <div className="process-mobile-timeline">
+              {PROCESS_STEPS.map((step, idx) => (
+                <div key={step.id} className="process-mobile-step">
+                  <div className="process-mobile-track">
+                    <span className="process-mobile-circle">{step.num}</span>
+                    {idx < PROCESS_STEPS.length - 1 && <span className="process-mobile-line" />}
+                  </div>
+                  <div className="process-mobile-body">
+                    <span className="process-mobile-phase">Phase {step.num} &mdash; {step.name}</span>
+                    <h4 className="process-mobile-title">{step.title}</h4>
+                    <p className="process-mobile-desc">{step.desc}</p>
+                    <span className="process-mobile-metric">{step.metric}</span>
+                  </div>
+                </div>
+              ))}
             </div>
+          ) : (
+            <>
+              <div className="process-steps-nav" role="tablist" aria-label="Process steps">
+                <div className="process-nav-line">
+                  <div
+                    className="process-nav-fill"
+                    style={{ width: `${(activeStep / (PROCESS_STEPS.length - 1)) * 100}%` }}
+                  />
+                </div>
 
-            {PROCESS_STEPS.map((step, idx) => {
-              const isSelected = activeStep === idx;
-              const isDone = activeStep > idx;
-              return (
-                <button
-                  key={step.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={isSelected}
-                  className={`process-step-btn${isSelected ? ' is-active' : ''}${isDone ? ' is-done' : ''}`}
-                  onClick={() => setActiveStep(idx)}
+                {PROCESS_STEPS.map((step, idx) => {
+                  const isSelected = activeStep === idx;
+                  const isDone = activeStep > idx;
+                  return (
+                    <button
+                      key={step.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={isSelected}
+                      className={`process-step-btn${isSelected ? ' is-active' : ''}${isDone ? ' is-done' : ''}`}
+                      onClick={() => setActiveStep(idx)}
+                    >
+                      <span className="process-step-circle">
+                        {isDone ? <CheckCircle2 size={20} strokeWidth={2.6} /> : step.num}
+                      </span>
+                      <span className="process-step-label">{step.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={PROCESS_STEPS[activeStep].id}
+                  className="process-card-display"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -16 }}
+                  transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <span className="process-step-circle">
-                    {isDone ? <CheckCircle2 size={20} strokeWidth={2.6} /> : step.num}
-                  </span>
-                  <span className="process-step-label">{step.name}</span>
-                </button>
-              );
-            })}
-          </div>
+                  <div className="process-display-left">
+                    <h4>Phase {PROCESS_STEPS[activeStep].num} &mdash; {PROCESS_STEPS[activeStep].name}</h4>
+                    <h3>{PROCESS_STEPS[activeStep].title}</h3>
+                    <p>{PROCESS_STEPS[activeStep].desc}</p>
 
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={PROCESS_STEPS[activeStep].id}
-              className="process-card-display"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <div className="process-display-left">
-                <h4>Phase {PROCESS_STEPS[activeStep].num} &mdash; {PROCESS_STEPS[activeStep].name}</h4>
-                <h3>{PROCESS_STEPS[activeStep].title}</h3>
-                <p>{PROCESS_STEPS[activeStep].desc}</p>
+                    <ul className="process-deliverables">
+                      {PROCESS_STEPS[activeStep].deliverables.map((item) => (
+                        <li key={item}>
+                          <CheckCircle2 size={16} strokeWidth={2.4} />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
-                <ul className="process-deliverables">
-                  {PROCESS_STEPS[activeStep].deliverables.map((item) => (
-                    <li key={item}>
-                      <CheckCircle2 size={16} strokeWidth={2.4} />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="process-display-right">
-                <span className="process-display-right-decor">
-                  <i /> Engineering Standard
-                </span>
-                <p className="process-right-quote">
-                  &ldquo;{PROCESS_STEPS[activeStep].quote}&rdquo;
-                </p>
-                <span className="process-metric-tag">
-                  {PROCESS_STEPS[activeStep].metric}
-                </span>
-              </div>
-            </motion.div>
-          </AnimatePresence>
+                  <div className="process-display-right">
+                    <span className="process-display-right-decor">
+                      <i /> Engineering Standard
+                    </span>
+                    <p className="process-right-quote">
+                      &ldquo;{PROCESS_STEPS[activeStep].quote}&rdquo;
+                    </p>
+                    <span className="process-metric-tag">
+                      {PROCESS_STEPS[activeStep].metric}
+                    </span>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </>
+          )}
         </div>
       </div>
     </section>

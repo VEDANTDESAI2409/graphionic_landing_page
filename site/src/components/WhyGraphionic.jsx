@@ -1,9 +1,9 @@
-import { useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Target, Code2, Gauge, Users, ArrowUpRight } from 'lucide-react';
 import { WHY } from '../data/site';
 import { useInquiry } from '../context/Inquiry';
 import useIsMobile from '../hooks/useIsMobile';
-import WhyPinned from './WhyPinned';
 import TiltedCard from './react-bits/TiltedCard';
 import Magnet from './react-bits/Magnet';
 import { gsap, isReducedMotion } from '../utils/gsapConfig';
@@ -55,6 +55,7 @@ function CardFace({ w, i, bare = false }) {
 }
 
 export default function WhyGraphionic() {
+  const [activeWhy, setActiveWhy] = useState(0);
   const sectionRef = useRef(null);
   const headRef = useRef(null);
   const gridRef = useRef(null);
@@ -200,10 +201,48 @@ export default function WhyGraphionic() {
           </p>
         </div>
 
-        {/* Mobile: pinned + scrubbed reveal. Desktop: original grid.
-            Both render CardFace, so the card design is byte-identical. */}
+        {/* Mobile: Single card presentation with 01-04 user-controlled navigation. Desktop: original 3D tilted grid. */}
         {isMobile ? (
-          <WhyPinned items={WHY.map((w, i) => <CardFace key={w.title} w={w} i={i} />)} />
+          <div className="why-mobile-container">
+            {/* Number Navigation Tabs (01 02 03 04) */}
+            <div className="why-mobile-nav" role="tablist" aria-label="Why Graphionic pillars">
+              {WHY.map((item, idx) => {
+                const isActive = activeWhy === idx;
+                const numStr = String(idx + 1).padStart(2, '0');
+                return (
+                  <button
+                    key={item.title}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    aria-label={`Pillar ${numStr}: ${item.title}`}
+                    className={`why-nav-tab${isActive ? ' is-active' : ''}`}
+                    onClick={() => setActiveWhy(idx)}
+                  >
+                    <span className="why-nav-tab-num">{numStr}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Single Active Card with Smooth Transition */}
+            <div className="why-mobile-stage">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeWhy}
+                  initial={{ opacity: 0, x: 18 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -18 }}
+                  transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                  className="why-mobile-card-slot"
+                >
+                  <article className={`why-card${WHY[activeWhy].accent === 'lime' ? ' is-lime' : ''}`}>
+                    <CardFace w={WHY[activeWhy]} i={activeWhy} bare />
+                  </article>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
         ) : (
           <div className="why-grid" ref={gridRef}>
             {WHY.map((w, i) => (

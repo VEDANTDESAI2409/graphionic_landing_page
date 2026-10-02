@@ -19,6 +19,8 @@ import {
 } from 'lucide-react';
 import { ENGAGEMENT_MODELS } from '../data/site';
 import { useInquiry } from '../context/Inquiry';
+import useIsMobile from '../hooks/useIsMobile';
+import { gsap, isReducedMotion } from '../utils/gsapConfig';
 
 const ICONS = {
   target: Target,
@@ -182,19 +184,69 @@ function SupportVisual({ isActive }) {
 
 export default function EngagementModels() {
   const [activeIndex, setActiveIndex] = useState(1); // Default: Dedicated Team (index 1)
-  const [isMobile, setIsMobile] = useState(false);
+  const [mobileStep, setMobileStep] = useState(0);
+  const isMobile = useIsMobile();
   const containerRef = useRef(null);
+  const mobileTrackRef = useRef(null);
   const { openInquiry } = useInquiry();
 
-  // Responsive check
   useEffect(() => {
-    const check = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    check();
-    window.addEventListener('resize', check, { passive: true });
-    return () => window.removeEventListener('resize', check);
-  }, []);
+    if (!isMobile) return;
+    const track = mobileTrackRef.current;
+    if (!track) return;
+
+    const ctx = gsap.context(() => {
+      const reduced = isReducedMotion();
+      const card0 = track.querySelector('.eng-mobile-card-stacked--0');
+      const card1 = track.querySelector('.eng-mobile-card-stacked--1');
+      const card2 = track.querySelector('.eng-mobile-card-stacked--2');
+
+      if (!card0 || !card1 || !card2) return;
+
+      if (reduced) {
+        gsap.set([card0, card1, card2], { y: 0, scale: 1, opacity: 1 });
+        return;
+      }
+
+      // Initial positions: Card 0 active foreground, Card 1 & 2 layered below/behind
+      gsap.set(card0, { y: 0, scale: 1, opacity: 1, zIndex: 10 });
+      gsap.set(card1, { y: '105%', scale: 0.94, opacity: 0, zIndex: 20 });
+      gsap.set(card2, { y: '110%', scale: 0.90, opacity: 0, zIndex: 30 });
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: track,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 0.45,
+          onUpdate: (self) => {
+            const p = self.progress;
+            if (p < 0.42) {
+              setMobileStep(0);
+            } else if (p < 0.82) {
+              setMobileStep(1);
+            } else {
+              setMobileStep(2);
+            }
+          },
+        },
+      });
+
+      // Scroll Phase 1: Dedicated Team (Card 1) comes from behind/below into the foreground
+      tl.to(card1, { y: 0, scale: 1, opacity: 1, duration: 1, ease: 'power2.out' }, 0.1)
+        .to(card0, { scale: 0.94, y: -12, opacity: 0.65, duration: 1, ease: 'power2.out' }, 0.1);
+
+      // Scroll Phase 2: Hourly / Support (Card 2) comes forward in the same way
+      tl.to(card2, { y: 0, scale: 1, opacity: 1, duration: 1, ease: 'power2.out' }, 1.3)
+        .to(card1, { scale: 0.94, y: -12, opacity: 0.65, duration: 1, ease: 'power2.out' }, 1.3)
+        .to(card0, { scale: 0.88, y: -24, opacity: 0.35, duration: 1, ease: 'power2.out' }, 1.3);
+
+      // Buffer at the end before releasing pin into next section
+      tl.to({}, { duration: 0.5 });
+    }, mobileTrackRef);
+
+    return () => ctx.revert();
+  }, [isMobile]);
 
   const totalCards = ENGAGEMENT_MODELS.length;
 
@@ -228,7 +280,11 @@ export default function EngagementModels() {
   };
 
   return (
-    <section className="shell engage-section" id="engagement" ref={containerRef}>
+    <section
+      className={`engage-section ${isMobile ? 'engage-mobile-pinned-track' : 'shell'}`}
+      id="engagement"
+      ref={isMobile ? mobileTrackRef : containerRef}
+    >
       {/* Decorative ambient background accents */}
       <div className="engage-ambient-bg" aria-hidden="true">
         <div className="engage-ambient-grid left" />
@@ -236,21 +292,109 @@ export default function EngagementModels() {
         <div className="engage-ambient-orb" />
       </div>
 
-      {/* Section Header */}
-      <div className="sec-head engage-head">
-        <span className="pill engage-eyebrow">
-          <span className="pdot" />
-          WAYS TO WORK TOGETHER
-        </span>
-        <h2>
-          Choose Your <span className="b">Engagement Model</span>
-          <span className="acc">.</span>
-        </h2>
-        <p>Transparent scoping, a quote within 24 hours, and zero lock-in surprises.</p>
-      </div>
+      {isMobile ? (
+        <div className="engage-mobile-sticky-stage">
+          <div className="shell">
+            {/* Section Header */}
+            <div className="sec-head engage-head">
+              <span className="pill engage-eyebrow">
+                <span className="pdot" />
+                WAYS TO WORK TOGETHER
+              </span>
+              <h2>
+                Choose Your <span className="b">Engagement Model</span>
+                <span className="acc">.</span>
+              </h2>
+              <p>Transparent scoping, a quote within 24 hours, and zero lock-in surprises.</p>
+            </div>
 
-      {/* Interactive Expandable Cards Row */}
-      <div className="engage-carousel-wrapper">
+            {/* Mobile Step Indicator */}
+            <div className="engage-mobile-step-pills" aria-label={`Step ${mobileStep + 1} of 3: ${ENGAGEMENT_MODELS[mobileStep].title}`}>
+              {ENGAGEMENT_MODELS.map((m, idx) => (
+                <div
+                  key={m.title}
+                  className={`eng-step-pill${idx === mobileStep ? ' is-active' : ''}`}
+                >
+                  <span className="eng-step-dot" />
+                  <span className="eng-step-label">{m.title}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Pinned Card Stack Area */}
+            <div className="engage-mobile-stack-stage">
+              {ENGAGEMENT_MODELS.map((m, i) => {
+                const Ico = ICONS[m.icon] || Target;
+                const isPopular = i === 1;
+
+                return (
+                  <div
+                    key={m.title}
+                    className={`eng-mobile-card-stacked eng-mobile-card-stacked--${i} ${isPopular ? 'is-popular' : ''}`}
+                  >
+                    <div className="eng-mobile-card-header">
+                      <div className="eng-mobile-card-icon-wrap">
+                        <span className="eng-card-ico" aria-hidden="true">
+                          <Ico size={22} strokeWidth={2.2} />
+                        </span>
+                        <h3 className="eng-card-title">{m.title}</h3>
+                      </div>
+                      {isPopular && (
+                        <span className="eng-card-badge is-visible">
+                          MOST POPULAR
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="eng-card-desc">{m.desc}</p>
+
+                    <ul className="eng-card-points">
+                      {m.points.map((pt) => (
+                        <li key={pt}>
+                          <span className="eng-check-icon">
+                            <Check size={14} strokeWidth={2.8} />
+                          </span>
+                          <span>{pt}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="eng-card-footer">
+                      <span className="eng-card-best">BEST FOR: {m.best}</span>
+
+                      <button
+                        type="button"
+                        className={`eng-cta-btn ${isPopular ? 'btn-active-lime' : 'btn-inactive-blue'}`}
+                        onClick={(e) => handleCtaClick(e, m.title)}
+                        aria-label={`Get a quote for ${m.title}`}
+                      >
+                        <span>Get a quote</span>
+                        <ArrowRight size={15} strokeWidth={2.4} className="eng-btn-arrow" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Section Header */}
+          <div className="sec-head engage-head">
+            <span className="pill engage-eyebrow">
+              <span className="pdot" />
+              WAYS TO WORK TOGETHER
+            </span>
+            <h2>
+              Choose Your <span className="b">Engagement Model</span>
+              <span className="acc">.</span>
+            </h2>
+            <p>Transparent scoping, a quote within 24 hours, and zero lock-in surprises.</p>
+          </div>
+
+          {/* Interactive Expandable Cards Row for Desktop */}
+          <div className="engage-carousel-wrapper">
         {/* Left Arrow Button */}
         <button
           type="button"
@@ -356,20 +500,22 @@ export default function EngagementModels() {
         </button>
       </div>
 
-      {/* Pagination Indicators / Step Dots */}
-      <div className="engage-pagination-dots" role="tablist" aria-label="Engagement step indicators">
-        {ENGAGEMENT_MODELS.map((m, idx) => (
-          <button
-            key={m.title}
-            type="button"
-            role="tab"
-            aria-selected={activeIndex === idx}
-            aria-label={`Select ${m.title} model`}
-            className={`engage-dot${activeIndex === idx ? ' is-active' : ''}`}
-            onClick={() => setActiveIndex(idx)}
-          />
-        ))}
-      </div>
+        {/* Pagination Indicators / Step Dots */}
+        <div className="engage-pagination-dots" role="tablist" aria-label="Engagement step indicators">
+          {ENGAGEMENT_MODELS.map((m, idx) => (
+            <button
+              key={m.title}
+              type="button"
+              role="tab"
+              aria-selected={activeIndex === idx}
+              aria-label={`Select ${m.title} model`}
+              className={`engage-dot${activeIndex === idx ? ' is-active' : ''}`}
+              onClick={() => setActiveIndex(idx)}
+            />
+          ))}
+        </div>
+        </>
+      )}
     </section>
   );
 }

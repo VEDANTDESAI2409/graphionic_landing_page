@@ -31,7 +31,7 @@ export default function Footer() {
       const reduced = isReducedMotion();
       const cols = el.querySelectorAll('.foot-brand, .foot-col');
 
-      if (reduced) {
+      if (reduced || window.innerWidth <= 768) {
         gsap.set(cols, { opacity: 1, y: 0 });
         return;
       }
@@ -89,8 +89,8 @@ export default function Footer() {
             </Magnet>
           </div>
 
-          {/* nav */}
-          <div className="foot-col">
+          {/* nav (hidden on mobile per requirement #9) */}
+          <div className="foot-col foot-col-nav">
             <p className="foot-h">Navigation</p>
             <ul>
               {NAV.map((n) => (
@@ -101,8 +101,8 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* services */}
-          <div className="foot-col">
+          {/* services (hidden on mobile per requirement #9) */}
+          <div className="foot-col foot-col-services">
             <p className="foot-h">Services</p>
             <ul>
               {SERVICE_LINKS.map((s) => (

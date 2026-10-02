@@ -35,10 +35,10 @@ test.describe('Graphionic Infotech — Smoke & Functional Tests', () => {
 
   test('FAQ accordion toggles question answers', async ({ page }) => {
     await page.goto('/');
-    const firstFaq = page.locator('.faq-item').first();
-    const faqBtn = firstFaq.locator('.faq-q');
+    const secondFaq = page.locator('.faq-item').nth(1);
+    const faqBtn = secondFaq.locator('.faq-q');
 
     await faqBtn.click();
-    await expect(firstFaq.locator('.faq-a')).toBeVisible();
+    await expect(secondFaq.locator('.faq-a')).toBeVisible();
   });
 });

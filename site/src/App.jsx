@@ -2,6 +2,7 @@ import { InquiryProvider } from './context/Inquiry';
 import SmoothScroll from './context/SmoothScroll';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
+import TechnologyMarquee from './components/TechnologyMarquee';
 import About from './components/About';
 import Stats from './components/Stats';
 import Experience from './components/Experience';
@@ -40,6 +41,7 @@ export default function App() {
           <Navbar />
           <main>
             {/* 1 */} <Hero />
+            <TechnologyMarquee />
             {/* 2 */} <About />
             {/* 3 */} <Stats />
             {/* 4 */} <Experience />

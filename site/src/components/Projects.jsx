@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ArrowRight, ShieldCheck, Zap, Users } from 'lucide-react';
 import { PROJECTS } from '../data/projects';
 import { useInquiry } from '../context/Inquiry';
+import useIsMobile from '../hooks/useIsMobile';
 import { gsap, isReducedMotion } from '../utils/gsapConfig';
 
 const TECH_DOT_COLORS = ['#8B5CF6', '#007AFF', '#06B6D4', '#10B981', '#F59E0B'];
@@ -60,6 +61,7 @@ export default function Projects() {
   // Default to index 2 (Project 03) matching the primary reference design
   const [activeIndex, setActiveIndex] = useState(() => (PROJECTS.length > 2 ? 2 : 0));
   const activeIndexRef = useRef(activeIndex);
+  const isMobile = useIsMobile();
 
   const { openInquiry } = useInquiry();
   const shouldReduceMotion = useReducedMotion();
@@ -195,30 +197,105 @@ export default function Projects() {
               </p>
             </div>
 
-            {/* Mobile Horizontal Orbit Indicator Bar */}
-            <div className="prj-mobile-orbit-bar" role="tablist" aria-label="Mobile projects selector">
-              {PROJECTS.map((project, idx) => {
-                const isActive = idx === activeIndex;
-                const num = String(idx + 1).padStart(2, '0');
-                return (
-                  <button
-                    key={project.name}
-                    type="button"
-                    role="tab"
-                    aria-selected={isActive}
-                    aria-label={`Select project ${num}: ${project.name}`}
-                    className={`prj-mobile-orbit-btn ${isActive ? 'is-active' : ''}`}
-                    onClick={() => navigateToProject(idx)}
-                  >
-                    <span className="prj-mobile-orbit-num">{num}</span>
-                    {isActive && <span className="prj-mobile-orbit-dot" />}
-                  </button>
-                );
-              })}
-            </div>
+            {isMobile ? (
+              <div className="prj-mobile-stage">
+                <motion.article
+                  key={activeProject.name}
+                  className="prj-mobile-card"
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                  onTouchStart={handleTouchStart}
+                  onTouchEnd={handleTouchEnd}
+                >
+                  <div className="prj-mobile-card-top">
+                    <span className="prj-mobile-category">{activeProject.category || 'WEB APPLICATION'}</span>
+                    <span className="prj-mobile-badge">★ Featured</span>
+                  </div>
 
-            {/* Main Composition: Orbit Navigation + Central Showcase Stage */}
-            <div className="prj-layout-wrap">
+                  <div className="prj-mobile-img-box">
+                    <img
+                      src={activeProject.image}
+                      alt={activeProject.name}
+                      className="prj-mobile-img"
+                      loading="eager"
+                    />
+                  </div>
+
+                  <div className="prj-mobile-details">
+                    <h3 className="prj-mobile-title">{activeProject.name}</h3>
+                    <p className="prj-mobile-desc">{activeProject.description}</p>
+
+                    <div className="prj-mobile-tech">
+                      {activeProject.tech.map((t) => (
+                        <span key={t} className="prj-mobile-tag">{t}</span>
+                      ))}
+                    </div>
+
+                    <div className="prj-mobile-actions">
+                      <a
+                        href={activeProject.url || '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="prj-mobile-view-btn"
+                      >
+                        <span>View Project</span>
+                        <ArrowRight size={16} strokeWidth={2.4} />
+                      </a>
+                    </div>
+                  </div>
+                </motion.article>
+
+                {/* Mobile carousel navigation: < • • • • • > */}
+                <div className="prj-mobile-nav-bar">
+                  <button
+                    type="button"
+                    className="prj-mobile-arrow-btn"
+                    onClick={handlePrev}
+                    aria-label="Previous project"
+                  >
+                    <ChevronLeft size={20} strokeWidth={2.4} />
+                  </button>
+
+                  <div className="prj-mobile-nav-dots" role="tablist" aria-label="Project selection">
+                    {PROJECTS.map((p, idx) => (
+                      <button
+                        key={p.name}
+                        type="button"
+                        role="tab"
+                        aria-selected={idx === activeIndex}
+                        aria-label={`Jump to project ${idx + 1}`}
+                        className={`prj-mobile-nav-dot${idx === activeIndex ? ' is-active' : ''}`}
+                        onClick={() => navigateToProject(idx)}
+                      />
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    className="prj-mobile-arrow-btn"
+                    onClick={handleNext}
+                    aria-label="Next project"
+                  >
+                    <ChevronRight size={20} strokeWidth={2.4} />
+                  </button>
+                </div>
+
+                <div className="prj-mobile-bottom-cta">
+                  <button
+                    type="button"
+                    className="btn btn-navy prj-mobile-inquire-btn"
+                    onClick={openInquiry}
+                  >
+                    <span>Start Your Project</span>
+                    <ArrowRight size={16} strokeWidth={2.4} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Main Composition: Orbit Navigation + Central Showcase Stage */}
+                <div className="prj-layout-wrap">
               {/* LEFT ORBIT NAVIGATION */}
               <nav className="prj-orbit-nav" aria-label="Projects orbit navigation">
                 <svg
@@ -526,9 +603,11 @@ export default function Projects() {
                 />
               </svg>
             </div>
-          </div>
+            </>
+          )}
         </div>
       </div>
-    </section>
+    </div>
+  </section>
   );
 }

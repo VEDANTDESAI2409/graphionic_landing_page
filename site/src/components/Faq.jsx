@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, MessageSquare, ArrowUpRight, Zap, ShieldCheck, Users, Globe } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, MessageSquare, ArrowUpRight, Zap, ShieldCheck, Users, Globe } from 'lucide-react';
 import { FAQS } from '../data/site';
 import { useInquiry } from '../context/Inquiry';
 import useIsMobile from '../hooks/useIsMobile';
@@ -78,6 +78,17 @@ export default function Faq() {
             },
           });
         }
+      }
+
+      const isMobileScreen = window.innerWidth <= 768;
+
+      if (isMobileScreen) {
+        if (headingRef.current) gsap.set(headingRef.current, { opacity: 1, y: 0 });
+        if (listRef.current) {
+          const items = listRef.current.querySelectorAll('.faq-item');
+          gsap.set(items, { opacity: 1, y: 0 });
+        }
+        return;
       }
 
       // Heading SplitText line reveal
@@ -203,10 +214,11 @@ export default function Faq() {
             </ul>
           </aside>
 
-          {/* ---- accordion ---- */}
-          <div className="faq-list" ref={listRef}>
-            {isMobile && (
-              <div className="faq-prog" aria-hidden="true">
+          {/* Mobile: ONLY ONE FAQ VISIBLE AT A TIME per requirement #8 */}
+          {isMobile ? (
+            <div className="faq-mobile-single-view">
+              {/* Progress Indicator */}
+              <div className="faq-prog" aria-label={`Question ${active + 1} of ${FAQS.length}`}>
                 <span className="faq-prog-txt">
                   <b>{String(active + 1).padStart(2, '0')}</b> / {String(FAQS.length).padStart(2, '0')}
                 </span>
@@ -217,47 +229,97 @@ export default function Faq() {
                   />
                 </span>
               </div>
-            )}
-            {FAQS.map((f, i) => {
-              const isOpen = isMobile ? active === i : open === i;
-              return (
-                <div
-                  key={f.q}
-                  className={`faq-item${isOpen ? ' is-open' : ''}`}
-                >
-                  <button
-                    className="faq-q"
-                    onClick={() => setOpen(isOpen && !isMobile ? -1 : i)}
-                    aria-expanded={isOpen}
-                  >
-                    <span className="faq-n">{String(i + 1).padStart(2, '0')}</span>
-                    <span className="faq-t">{f.q}</span>
-                    <motion.span
-                      className="faq-c"
-                      animate={{ rotate: isOpen ? 180 : 0 }}
-                      transition={{ duration: 0.36, ease }}
-                    >
-                      <ChevronDown size={19} strokeWidth={2.3} />
-                    </motion.span>
-                  </button>
 
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        className="faq-a"
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.4, ease }}
+              {/* Single FAQ Card */}
+              <div className="faq-mobile-card-slot">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={active}
+                    initial={{ opacity: 0, x: 22 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -22 }}
+                    transition={{ duration: 0.28, ease }}
+                    className="faq-mobile-card"
+                  >
+                    <div className="faq-mobile-card-header">
+                      <span className="faq-n">{String(active + 1).padStart(2, '0')}</span>
+                      <h3 className="faq-mobile-q-title">{FAQS[active].q}</h3>
+                    </div>
+                    <div className="faq-mobile-card-body">
+                      <p>{FAQS[active].a}</p>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              {/* Next Navigation Controls */}
+              <div className="faq-mobile-nav-controls">
+                {active > 0 && (
+                  <button
+                    type="button"
+                    className="faq-mobile-prev-btn"
+                    onClick={() => setOpen(active - 1)}
+                    aria-label="Previous question"
+                  >
+                    <ChevronLeft size={18} strokeWidth={2.4} />
+                    <span>Prev</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="faq-mobile-next-btn"
+                  onClick={() => setOpen((active + 1) % FAQS.length)}
+                  aria-label={active === FAQS.length - 1 ? 'Go to question 1' : `Go to question ${active + 2}`}
+                >
+                  <span>{active === FAQS.length - 1 ? 'Start Over (01/07)' : 'Next Question'}</span>
+                  <ChevronRight size={18} strokeWidth={2.4} />
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* ---- Desktop Accordion ---- */
+            <div className="faq-list" ref={listRef}>
+              {FAQS.map((f, i) => {
+                const isOpen = open === i;
+                return (
+                  <div
+                    key={f.q}
+                    className={`faq-item${isOpen ? ' is-open' : ''}`}
+                  >
+                    <button
+                      className="faq-q"
+                      onClick={() => setOpen(isOpen ? -1 : i)}
+                      aria-expanded={isOpen}
+                    >
+                      <span className="faq-n">{String(i + 1).padStart(2, '0')}</span>
+                      <span className="faq-t">{f.q}</span>
+                      <motion.span
+                        className="faq-c"
+                        animate={{ rotate: isOpen ? 180 : 0 }}
+                        transition={{ duration: 0.36, ease }}
                       >
-                        <p>{f.a}</p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              );
-            })}
-          </div>
+                        <ChevronDown size={19} strokeWidth={2.3} />
+                      </motion.span>
+                    </button>
+
+                    <AnimatePresence initial={false}>
+                      {isOpen && (
+                        <motion.div
+                          className="faq-a"
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.4, ease }}
+                        >
+                          <p>{f.a}</p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </section>

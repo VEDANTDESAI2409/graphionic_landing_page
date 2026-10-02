@@ -6,12 +6,14 @@ import ServiceFan from './ServiceFan';
 import Aurora from './react-bits/Aurora';
 import Magnet from './react-bits/Magnet';
 import ShinyText from './react-bits/ShinyText';
+import useIsMobile from '../hooks/useIsMobile';
 import { gsap, SplitText, isReducedMotion, isTouchDevice } from '../utils/gsapConfig';
 
 export default function Hero() {
   const { openInquiry } = useInquiry();
   const heroRef = useRef(null);
   const headingRef = useRef(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (isReducedMotion()) return;
@@ -204,15 +206,17 @@ export default function Hero() {
               </Magnet>
             </div>
 
-            {/* trust signal, lifted into the first fold */}
-            <div className="hero-proof">
-              <span className="stars">
-                {[0, 1, 2, 3, 4].map((i) => (
-                  <Star key={i} size={16} fill="#FFCE1F" color="#F2B705" strokeWidth={1} />
-                ))}
-              </span>
-              <p>Rated 4.9/5 by 100+ Clients</p>
-            </div>
+            {/* trust signal, lifted into the first fold (desktop only) */}
+            {!isMobile && (
+              <div className="hero-proof">
+                <span className="stars">
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <Star key={i} size={16} fill="#FFCE1F" color="#F2B705" strokeWidth={1} />
+                  ))}
+                </span>
+                <p>Rated 4.9/5 by 100+ Clients</p>
+              </div>
+            )}
           </div>
         </div>
 
