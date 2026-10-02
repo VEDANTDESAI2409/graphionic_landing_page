@@ -188,12 +188,14 @@ export default function EngagementModels() {
   const isMobile = useIsMobile();
   const containerRef = useRef(null);
   const mobileTrackRef = useRef(null);
+  const mobileStageRef = useRef(null);
   const { openInquiry } = useInquiry();
 
   useEffect(() => {
     if (!isMobile) return;
     const track = mobileTrackRef.current;
-    if (!track) return;
+    const stage = mobileStageRef.current;
+    if (!track || !stage) return;
 
     const ctx = gsap.context(() => {
       const reduced = isReducedMotion();
@@ -210,20 +212,22 @@ export default function EngagementModels() {
 
       // Initial positions: Card 0 active foreground, Card 1 & 2 layered below/behind
       gsap.set(card0, { y: 0, scale: 1, opacity: 1, zIndex: 10 });
-      gsap.set(card1, { y: '105%', scale: 0.94, opacity: 0, zIndex: 20 });
-      gsap.set(card2, { y: '110%', scale: 0.90, opacity: 0, zIndex: 30 });
+      gsap.set(card1, { y: '95%', scale: 0.94, opacity: 0, zIndex: 20 });
+      gsap.set(card2, { y: '100%', scale: 0.90, opacity: 0, zIndex: 30 });
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: track,
+          pin: stage,
           start: 'top top',
           end: 'bottom bottom',
-          scrub: 0.45,
+          scrub: 0.5,
+          pinSpacing: false,
           onUpdate: (self) => {
             const p = self.progress;
-            if (p < 0.42) {
+            if (p < 0.40) {
               setMobileStep(0);
-            } else if (p < 0.82) {
+            } else if (p < 0.78) {
               setMobileStep(1);
             } else {
               setMobileStep(2);
@@ -234,12 +238,12 @@ export default function EngagementModels() {
 
       // Scroll Phase 1: Dedicated Team (Card 1) comes from behind/below into the foreground
       tl.to(card1, { y: 0, scale: 1, opacity: 1, duration: 1, ease: 'power2.out' }, 0.1)
-        .to(card0, { scale: 0.94, y: -12, opacity: 0.65, duration: 1, ease: 'power2.out' }, 0.1);
+        .to(card0, { scale: 0.94, y: -14, opacity: 0.6, duration: 1, ease: 'power2.out' }, 0.1);
 
       // Scroll Phase 2: Hourly / Support (Card 2) comes forward in the same way
       tl.to(card2, { y: 0, scale: 1, opacity: 1, duration: 1, ease: 'power2.out' }, 1.3)
-        .to(card1, { scale: 0.94, y: -12, opacity: 0.65, duration: 1, ease: 'power2.out' }, 1.3)
-        .to(card0, { scale: 0.88, y: -24, opacity: 0.35, duration: 1, ease: 'power2.out' }, 1.3);
+        .to(card1, { scale: 0.94, y: -14, opacity: 0.6, duration: 1, ease: 'power2.out' }, 1.3)
+        .to(card0, { scale: 0.88, y: -26, opacity: 0.3, duration: 1, ease: 'power2.out' }, 1.3);
 
       // Buffer at the end before releasing pin into next section
       tl.to({}, { duration: 0.5 });
@@ -293,7 +297,7 @@ export default function EngagementModels() {
       </div>
 
       {isMobile ? (
-        <div className="engage-mobile-sticky-stage">
+        <div className="engage-mobile-sticky-stage" ref={mobileStageRef}>
           <div className="shell">
             {/* Section Header */}
             <div className="sec-head engage-head">

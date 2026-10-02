@@ -8,8 +8,9 @@ export default function SmoothScroll({ children }) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Respect user prefers-reduced-motion preference
-    if (isReducedMotion()) {
+    // Respect user prefers-reduced-motion preference, and disable Lenis on mobile screens (<768px)
+    // so native mobile touch scroll and GSAP ScrollTrigger pinning work with 100% precision
+    if (isReducedMotion() || window.innerWidth <= 768) {
       return;
     }
 

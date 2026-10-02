@@ -10,6 +10,8 @@ const VIEWPORTS = [
   { name: '430px_promax', width: 430, height: 932 },
 ];
 
+const windowScroll = async (page, y) => page.evaluate((val) => window.scrollTo(0, val), y);
+
 test.describe('Mobile Optimization & Zero-Overflow Audits', () => {
   test.setTimeout(60000);
 
@@ -81,13 +83,61 @@ test.describe('Mobile Optimization & Zero-Overflow Audits', () => {
     await expect(statsGrid).toContainText('Speed & Performance');
     await expect(statsGrid).not.toContainText('520k+');
 
+    // Verify 7+ Years Experience card is removed from mobile
+    const expCard = page.locator('.exp-wrap .exp');
+    await expect(expCard).not.toBeVisible();
+
+    // 5b. Verify About Us Pinned Interaction
+    const aboutTrack = page.locator('.about.about-track');
+    await expect(aboutTrack).toBeVisible();
+    const aboutStage = page.locator('.about-sticky-stage');
+    await expect(aboutStage).toBeVisible();
+
+    // Scroll until About Us track hits top of viewport
+    const aboutTrackTop = await aboutTrack.evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
+    await windowScroll(page, aboutTrackTop + 50);
+    await page.waitForTimeout(100);
+
+    // Verify stage is pinned to top of viewport
+    let stageBox = await aboutStage.boundingBox();
+    expect(stageBox.y).toBeLessThanOrEqual(5);
+
+    // Scroll further into the track (e.g. +300px) and verify stage is STILL pinned at top
+    await windowScroll(page, aboutTrackTop + 350);
+    await page.waitForTimeout(100);
+    stageBox = await aboutStage.boundingBox();
+    expect(stageBox.y).toBeLessThanOrEqual(5);
+
     // 6. Mobile Engagement Models Pinned Stack
     const engageTrack = page.locator('.engage-mobile-pinned-track');
     await expect(engageTrack).toBeVisible();
+    const engageStage = page.locator('.engage-mobile-sticky-stage');
+    await expect(engageStage).toBeVisible();
     const stackedCards = page.locator('.eng-mobile-card-stacked');
     await expect(stackedCards).toHaveCount(3);
     const popularBadge = page.locator('.eng-mobile-card-stacked .eng-card-badge');
     await expect(popularBadge).toContainText('MOST POPULAR');
+
+    // Scroll to start of Engagement Model track
+    const engageTrackTop = await engageTrack.evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
+    await windowScroll(page, engageTrackTop + 40);
+    await page.waitForTimeout(100);
+
+    // Verify stage pins to viewport
+    let engageBox = await engageStage.boundingBox();
+    expect(engageBox.y).toBeLessThanOrEqual(5);
+
+    // Scroll into phase 1 (Card 02 active)
+    await windowScroll(page, engageTrackTop + 400);
+    await page.waitForTimeout(150);
+    engageBox = await engageStage.boundingBox();
+    expect(engageBox.y).toBeLessThanOrEqual(5); // Still pinned!
+
+    // Scroll into phase 2 (Card 03 active)
+    await windowScroll(page, engageTrackTop + 800);
+    await page.waitForTimeout(150);
+    engageBox = await engageStage.boundingBox();
+    expect(engageBox.y).toBeLessThanOrEqual(5); // Still pinned!
 
     // 7. Why Graphionic (Single card visible + 01-04 tabs)
     const whyTabs = page.locator('.why-nav-tab');
@@ -100,6 +150,16 @@ test.describe('Mobile Optimization & Zero-Overflow Audits', () => {
     await whyTabs.nth(1).click();
     await page.waitForTimeout(350);
     await expect(whyActiveCard).toContainText('Modern engineering');
+
+    // Click tab 03
+    await whyTabs.nth(2).click();
+    await page.waitForTimeout(350);
+    await expect(whyActiveCard).toContainText('Performance focused');
+
+    // Click tab 04
+    await whyTabs.nth(3).click();
+    await page.waitForTimeout(350);
+    await expect(whyActiveCard).toContainText('Long-term partnership');
 
     // 8. Google Reviews (Summary badge ONLY on mobile, no individual cards)
     const revBadge = page.locator('.rev-badge');
@@ -129,10 +189,17 @@ test.describe('Mobile Optimization & Zero-Overflow Audits', () => {
     const footBrand = page.locator('.foot-brand');
     await expect(footBrand).toBeVisible();
 
-    // Scroll through page to activate all animations and capture screenshot
+    // 11. Responsive Typography Verification
+    const heroH1FontSize = await heroH1.evaluate((el) => parseFloat(window.getComputedStyle(el).fontSize));
+    expect(heroH1FontSize).toBeGreaterThanOrEqual(32);
+
+    const btnHeight = await btnGetStarted.evaluate((el) => parseFloat(window.getComputedStyle(el).height));
+    expect(btnHeight).toBeGreaterThanOrEqual(48);
+
+    // Scroll through page to activate all animations and capture fullpage screenshot
     await page.evaluate(async () => {
       const distance = 400;
-      const delay = 50;
+      const delay = 40;
       const total = document.body.scrollHeight;
       for (let y = 0; y < total; y += distance) {
         window.scrollTo(0, y);

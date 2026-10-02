@@ -45,7 +45,7 @@ body {
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 h1, h2, h3, h4, p { margin: 0; }
@@ -936,13 +936,21 @@ img { max-width: 100%; display: block; }
 
 @media (max-width: 768px) {
   .about.about-track {
-    min-height: 118vh;
-    padding: 0;
+    min-height: 165vh !important;
+    padding: 0 !important;
+    position: relative !important;
   }
   .about-sticky-stage {
-    top: 60px;
-    height: calc(100dvh - 60px);
-    padding: 24px 0 16px;
+    position: sticky !important;
+    top: 0 !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 80px 16px 24px !important;
+    box-sizing: border-box !important;
   }
   .about-br {
     display: none;
@@ -1225,30 +1233,35 @@ img { max-width: 100%; display: block; }
 
 @media (max-width: 540px) {
   .fan {
-    height: 285px;
+    height: 310px;
   }
   .fan-track {
-    height: 250px;
+    height: 275px;
   }
   .svc {
-    width: 195px;
-    height: 190px;
-    border-radius: 16px;
+    width: clamp(235px, 66vw, 275px);
+    height: 235px;
+    border-radius: 20px;
   }
   .svc-top {
-    padding: 10px 12px 6px;
+    padding: 12px 14px 8px;
+    gap: 10px;
   }
   .svc-icon-box {
-    width: 32px; height: 32px;
+    width: 36px; height: 36px;
+    border-radius: 10px;
   }
   .svc-title {
-    font-size: 13px;
+    font-size: 15px;
+    font-weight: 700;
   }
   .svc-sub {
-    display: none;
+    display: block;
+    font-size: 11px;
+    opacity: 0.85;
   }
   .fan-ctrl-btn {
-    width: 28px; height: 28px;
+    width: 32px; height: 32px;
   }
 }
 
@@ -5104,19 +5117,37 @@ img { max-width: 100%; display: block; }
 }
 
 @media (max-width: 768px) {
-  /* Prevent horizontal overflow across all elements */
+  /* Prevent horizontal overflow without breaking position: sticky */
   html, body {
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
     max-width: 100vw !important;
   }
   .page {
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
     padding: 8px 0;
   }
   .shell {
-    padding-left: 18px !important;
-    padding-right: 18px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
     box-sizing: border-box !important;
+  }
+
+  /* Shared Section Headings on Mobile */
+  .sec-head h2 {
+    font-size: clamp(30px, 8.2vw, 38px) !important;
+    line-height: 1.18 !important;
+    letter-spacing: -0.03em !important;
+  }
+  .sec-head > p {
+    font-size: 15.5px !important;
+    line-height: 1.6 !important;
+    margin: 14px auto 0 !important;
+    color: var(--gray-600) !important;
+    max-width: 100% !important;
+  }
+  .pill {
+    font-size: 11.5px !important;
+    padding: 8px 18px !important;
   }
 
   /* ---- 1. Mobile Hero ---- */
@@ -5126,20 +5157,19 @@ img { max-width: 100%; display: block; }
     overflow: hidden;
   }
   .hero-content {
-    padding-top: 100px;
+    padding-top: 96px;
   }
   .hero-h1 {
-    font-size: clamp(28px, 7.8vw, 36px);
-    line-height: 1.16;
-    letter-spacing: -0.03em;
+    font-size: clamp(34px, 9.2vw, 44px) !important;
+    line-height: 1.14 !important;
+    letter-spacing: -0.03em !important;
   }
   .hero-sub {
-    font-size: 14.5px;
-    line-height: 1.55;
-    margin-top: 14px;
-    max-width: 360px;
-    margin-left: auto;
-    margin-right: auto;
+    font-size: 16px !important;
+    line-height: 1.6 !important;
+    margin-top: 16px !important;
+    max-width: 100% !important;
+    padding: 0 4px;
   }
   .hero-ctas {
     display: flex !important;
@@ -5147,10 +5177,10 @@ img { max-width: 100%; display: block; }
     flex-wrap: nowrap !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 8px !important;
-    margin-top: 20px !important;
+    gap: 10px !important;
+    margin-top: 24px !important;
     width: 100% !important;
-    max-width: 360px !important;
+    max-width: 380px !important;
     margin-left: auto !important;
     margin-right: auto !important;
   }
@@ -5163,19 +5193,21 @@ img { max-width: 100%; display: block; }
   .hero-ctas .btn-lime,
   .hero-ctas .btn-glass {
     width: 100% !important;
-    height: 46px !important;
-    min-height: 46px !important;
-    max-height: 46px !important;
-    padding: 0 12px !important;
-    font-size: 13.5px !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    max-height: 52px !important;
+    padding: 0 14px !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     white-space: nowrap !important;
+    border-radius: 999px !important;
     box-sizing: border-box !important;
   }
   .hero-ctas .btn .ico {
-    margin-left: 5px !important;
+    margin-left: 6px !important;
   }
   .hero-words, .hero-scribble {
     display: none !important;
@@ -5184,23 +5216,40 @@ img { max-width: 100%; display: block; }
     display: none !important;
   }
 
-  /* ---- 2. Mobile Stats (Square aligned 2-card grid per requirement #4) ---- */
+  /* ---- 2. About Us on Mobile ---- */
+  .about h2 {
+    font-size: clamp(30px, 8.2vw, 40px) !important;
+    line-height: 1.22 !important;
+    letter-spacing: -0.028em !important;
+    text-align: center !important;
+  }
+  .about p {
+    font-size: 15.5px !important;
+    line-height: 1.65 !important;
+    margin-top: 20px !important;
+  }
+  .globe-badge {
+    font-size: 12px !important;
+    padding: 7px 16px !important;
+  }
+
+  /* ---- 3. Mobile Stats (Square aligned 2-card grid per requirement #9) ---- */
   .stats-mobile-grid {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
-    width: 100% !important;
+    gap: 14px !important;
+    width: calc(100% - 32px) !important;
     max-width: 440px !important;
     margin: 0 auto !important;
   }
   .stat-m-card {
     aspect-ratio: 1 / 1 !important;
-    min-height: 155px !important;
+    min-height: 180px !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
-    padding: 16px 14px !important;
-    border-radius: 20px !important;
+    padding: 22px 18px !important;
+    border-radius: 22px !important;
     position: relative !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
@@ -5208,13 +5257,13 @@ img { max-width: 100%; display: block; }
   .stat-m-card--blue {
     background: linear-gradient(158deg, var(--blue) 0%, #007AFF 45%, #0067DB 100%) !important;
     color: #fff !important;
-    box-shadow: 0 14px 34px -14px rgba(0, 90, 200, 0.5) !important;
+    box-shadow: 0 16px 36px -14px rgba(0, 90, 200, 0.5) !important;
   }
   .stat-m-card--light {
     background: var(--gray-50) !important;
     color: var(--ink) !important;
     border: 1px solid #ECEFF3 !important;
-    box-shadow: 0 14px 30px -16px rgba(10, 25, 60, 0.18) !important;
+    box-shadow: 0 16px 34px -16px rgba(10, 25, 60, 0.18) !important;
   }
   .stat-m-top {
     display: flex !important;
@@ -5223,28 +5272,28 @@ img { max-width: 100%; display: block; }
     width: 100% !important;
   }
   .stat-m-badge {
-    width: 34px !important;
-    height: 34px !important;
-    border-radius: 10px !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 12px !important;
     display: grid !important;
     place-items: center !important;
   }
   .stat-m-card--blue .stat-m-badge {
-    background: rgba(255, 255, 255, 0.18) !important;
+    background: rgba(255, 255, 255, 0.22) !important;
     color: #fff !important;
   }
   .stat-m-card--light .stat-m-badge {
-    background: rgba(0, 122, 255, 0.08) !important;
+    background: rgba(0, 122, 255, 0.1) !important;
     color: var(--blue) !important;
   }
   .stat-m-n {
-    font-size: 11px !important;
-    font-weight: 700 !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
     letter-spacing: 0.06em !important;
-    opacity: 0.6 !important;
+    opacity: 0.7 !important;
   }
   .stat-m-num {
-    font-size: clamp(28px, 8vw, 36px) !important;
+    font-size: clamp(34px, 9vw, 42px) !important;
     font-weight: 800 !important;
     letter-spacing: -0.035em !important;
     line-height: 1 !important;
@@ -5252,24 +5301,31 @@ img { max-width: 100%; display: block; }
     margin-bottom: 6px !important;
   }
   .stat-m-label {
-    font-size: 12.5px !important;
+    font-size: 14.5px !important;
     font-weight: 700 !important;
     line-height: 1.25 !important;
     letter-spacing: -0.01em !important;
   }
 
-  /* ---- 3. Mobile Process Timeline ---- */
+  /* ---- 4. Experience & Process Timeline (7+ Years banner removed on mobile per requirement #9) ---- */
+  .exp-wrap .exp {
+    display: none !important;
+  }
   .process-timeline {
-    margin-top: 40px;
-    padding: 28px 20px;
+    margin-top: 24px !important;
+    padding: 28px 20px !important;
     background: #FFFFFF;
     border: 1px solid #EBF1F8;
     border-radius: 24px;
     box-shadow: 0 10px 30px -10px rgba(10, 40, 90, 0.06);
   }
   .process-head h3 {
-    font-size: 22px;
-    line-height: 1.25;
+    font-size: 24px !important;
+    line-height: 1.22 !important;
+  }
+  .process-head p {
+    font-size: 15px !important;
+    line-height: 1.6 !important;
   }
   .process-mobile-timeline {
     display: flex;
@@ -5287,16 +5343,16 @@ img { max-width: 100%; display: block; }
     flex-direction: column;
     align-items: center;
     flex-shrink: 0;
-    width: 36px;
+    width: 40px;
   }
   .process-mobile-circle {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: var(--blue);
     color: #FFFFFF;
-    font-weight: 700;
-    font-size: 13px;
+    font-weight: 800;
+    font-size: 14px;
     display: grid;
     place-items: center;
     box-shadow: 0 4px 14px rgba(0, 122, 255, 0.35);
@@ -5311,56 +5367,58 @@ img { max-width: 100%; display: block; }
     flex: 1;
     background: #F8FAFD;
     border: 1px solid #EBF1F8;
-    border-radius: 18px;
-    padding: 16px 16px 14px;
+    border-radius: 20px;
+    padding: 18px 18px 16px;
   }
   .process-mobile-phase {
-    font-size: 11px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--blue);
   }
   .process-mobile-title {
-    font-size: 15.5px;
-    font-weight: 700;
-    margin-top: 5px;
+    font-size: 17px;
+    font-weight: 800;
+    margin-top: 6px;
     color: var(--ink);
   }
   .process-mobile-desc {
-    font-size: 13px;
-    line-height: 1.5;
+    font-size: 14px;
+    line-height: 1.55;
     margin-top: 6px;
     color: var(--gray-600);
   }
   .process-mobile-metric {
     display: inline-block;
     margin-top: 10px;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     color: #0A0F1D;
     background: rgba(210, 255, 40, 0.55);
-    padding: 3px 9px;
+    padding: 4px 10px;
     border-radius: 999px;
   }
 
-  /* ---- 4. Mobile Engagement Models Pinned Stack per requirement #5 ---- */
+  /* ---- 5. Mobile Engagement Models Pinned Stack per requirements #2, #3, #4, #5, #6 ---- */
   .engage-mobile-pinned-track {
     position: relative !important;
-    min-height: 165vh !important;
+    min-height: 195vh !important;
     padding: 0 !important;
-    margin-top: 16px !important;
+    margin-top: 24px !important;
   }
   .engage-mobile-sticky-stage {
     position: sticky !important;
-    top: 60px !important;
-    height: calc(100dvh - 60px) !important;
+    top: 0 !important;
+    height: 100vh !important;
+    height: 100dvh !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
     overflow: hidden !important;
     width: 100% !important;
+    padding: 82px 16px 20px !important;
     box-sizing: border-box !important;
   }
   .engage-mobile-step-pills {
@@ -5368,36 +5426,36 @@ img { max-width: 100%; display: block; }
     align-items: center !important;
     justify-content: center !important;
     gap: 8px !important;
-    margin: 10px 0 16px !important;
+    margin: 12px 0 18px !important;
   }
   .eng-step-pill {
     display: flex !important;
     align-items: center !important;
     gap: 6px !important;
-    padding: 4px 10px !important;
+    padding: 6px 14px !important;
     border-radius: 999px !important;
     background: rgba(0, 122, 255, 0.08) !important;
     color: var(--gray-500) !important;
-    font-size: 10.5px !important;
+    font-size: 12px !important;
     font-weight: 700 !important;
     transition: all 0.28s ease !important;
   }
   .eng-step-pill.is-active {
     background: var(--blue) !important;
     color: #FFFFFF !important;
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3) !important;
+    box-shadow: 0 4px 14px rgba(0, 122, 255, 0.35) !important;
   }
   .eng-step-dot {
-    width: 5px !important;
-    height: 5px !important;
+    width: 6px !important;
+    height: 6px !important;
     border-radius: 50% !important;
     background: currentColor !important;
   }
   .engage-mobile-stack-stage {
     position: relative !important;
-    width: 100% !important;
-    max-width: 400px !important;
-    height: 385px !important;
+    width: calc(100% - 32px) !important;
+    max-width: 440px !important;
+    height: 420px !important;
     margin: 0 auto !important;
   }
   .eng-mobile-card-stacked {
@@ -5408,9 +5466,9 @@ img { max-width: 100%; display: block; }
     height: 100% !important;
     background: #FFFFFF !important;
     border: 1px solid #E2E8F0 !important;
-    border-radius: 22px !important;
-    padding: 18px 16px !important;
-    box-shadow: 0 14px 34px -12px rgba(10, 40, 90, 0.12) !important;
+    border-radius: 24px !important;
+    padding: 22px 20px !important;
+    box-shadow: 0 16px 40px -12px rgba(10, 40, 90, 0.15) !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
@@ -5420,25 +5478,25 @@ img { max-width: 100%; display: block; }
   }
   .eng-mobile-card-stacked.is-popular {
     border-color: #007AFF !important;
-    box-shadow: 0 16px 40px -12px rgba(0, 122, 255, 0.22) !important;
+    box-shadow: 0 18px 44px -12px rgba(0, 122, 255, 0.25) !important;
     background: linear-gradient(180deg, #FFFFFF 0%, #F5F9FE 100%) !important;
   }
   .eng-mobile-card-header {
     display: flex !important;
     justify-content: space-between !important;
     align-items: flex-start !important;
-    gap: 8px !important;
+    gap: 10px !important;
     margin-bottom: 8px !important;
   }
   .eng-mobile-card-icon-wrap {
     display: flex !important;
     align-items: center !important;
-    gap: 10px !important;
+    gap: 12px !important;
   }
   .eng-mobile-card-header .eng-card-ico {
-    width: 38px !important;
-    height: 38px !important;
-    border-radius: 10px !important;
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 12px !important;
     background: rgba(0, 122, 255, 0.1) !important;
     color: #007AFF !important;
     display: grid !important;
@@ -5446,40 +5504,40 @@ img { max-width: 100%; display: block; }
     flex-shrink: 0 !important;
   }
   .eng-mobile-card-header .eng-card-title {
-    font-size: 16px !important;
-    font-weight: 700 !important;
+    font-size: 19px !important;
+    font-weight: 800 !important;
     margin: 0 !important;
     color: var(--ink) !important;
   }
   .eng-mobile-card-stacked .eng-card-badge {
     background: var(--lime) !important;
     color: var(--navy) !important;
-    font-size: 9.5px !important;
+    font-size: 11px !important;
     font-weight: 800 !important;
-    padding: 3px 8px !important;
+    padding: 4px 10px !important;
     border-radius: 999px !important;
     letter-spacing: 0.05em !important;
     white-space: nowrap !important;
   }
   .eng-mobile-card-stacked .eng-card-desc {
-    font-size: 12.5px !important;
-    line-height: 1.45 !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
     color: var(--gray-600) !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 12px !important;
   }
   .eng-mobile-card-stacked .eng-card-points {
     list-style: none !important;
     padding: 0 !important;
-    margin: 0 0 12px !important;
+    margin: 0 0 14px !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 6px !important;
+    gap: 8px !important;
   }
   .eng-mobile-card-stacked .eng-card-points li {
     display: flex !important;
     align-items: center !important;
-    gap: 8px !important;
-    font-size: 12px !important;
+    gap: 10px !important;
+    font-size: 13.5px !important;
     color: var(--ink) !important;
   }
   .eng-mobile-card-stacked .eng-check-icon {
@@ -5489,33 +5547,34 @@ img { max-width: 100%; display: block; }
   .eng-mobile-card-stacked .eng-card-footer {
     display: flex !important;
     flex-direction: column !important;
-    gap: 8px !important;
-    padding-top: 10px !important;
+    gap: 10px !important;
+    padding-top: 12px !important;
     border-top: 1px solid #F1F5F9 !important;
   }
   .eng-mobile-card-stacked .eng-card-best {
-    font-size: 10.5px !important;
-    font-weight: 600 !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
     color: var(--gray-500) !important;
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
   }
   .eng-mobile-card-stacked .eng-cta-btn {
     width: 100% !important;
-    min-height: 42px !important;
+    height: 48px !important;
+    min-height: 48px !important;
     justify-content: center !important;
     border-radius: 999px !important;
     font-weight: 700 !important;
-    font-size: 13.5px !important;
+    font-size: 15px !important;
     display: inline-flex !important;
     align-items: center !important;
     gap: 8px !important;
     cursor: pointer !important;
   }
 
-  /* ---- 5. Mobile Projects Stage ---- */
+  /* ---- 6. Mobile Projects Stage ---- */
   .prj-mobile-stage {
-    width: 100%;
+    width: calc(100% - 32px);
     max-width: 440px;
     margin: 24px auto 0;
   }
@@ -5523,8 +5582,8 @@ img { max-width: 100%; display: block; }
     background: #FFFFFF;
     border: 1px solid rgba(0, 122, 255, 0.16);
     border-radius: 24px;
-    padding: 18px;
-    box-shadow: 0 14px 34px -12px rgba(0, 50, 120, 0.14);
+    padding: 20px;
+    box-shadow: 0 16px 36px -12px rgba(0, 50, 120, 0.14);
   }
   .prj-mobile-card-top {
     display: flex;
@@ -5533,7 +5592,7 @@ img { max-width: 100%; display: block; }
     margin-bottom: 12px;
   }
   .prj-mobile-category {
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 700;
     letter-spacing: 0.08em;
     color: #007AFF;
@@ -5543,12 +5602,12 @@ img { max-width: 100%; display: block; }
     background: #D2FF28;
     color: #0A0F1D;
     font-weight: 800;
-    font-size: 11px;
+    font-size: 11.5px;
     padding: 4px 10px;
     border-radius: 999px;
   }
   .prj-mobile-img-box {
-    border-radius: 16px;
+    border-radius: 18px;
     overflow: hidden;
     background: #F8FAFC;
     border: 1px solid #EDF2F7;
@@ -5564,14 +5623,14 @@ img { max-width: 100%; display: block; }
     margin-top: 16px;
   }
   .prj-mobile-title {
-    font-size: 19px;
+    font-size: 21px;
     font-weight: 800;
     color: var(--ink);
     line-height: 1.25;
   }
   .prj-mobile-desc {
-    font-size: 13.5px;
-    line-height: 1.55;
+    font-size: 14.5px;
+    line-height: 1.6;
     color: var(--gray-600);
     margin-top: 8px;
   }
@@ -5582,12 +5641,12 @@ img { max-width: 100%; display: block; }
     margin-top: 12px;
   }
   .prj-mobile-tag {
-    font-size: 11.5px;
+    font-size: 12.5px;
     font-weight: 600;
     color: #007AFF;
     background: rgba(0, 122, 255, 0.08);
     border-radius: 999px;
-    padding: 4px 10px;
+    padding: 5px 12px;
   }
   .prj-mobile-actions {
     margin-top: 16px;
@@ -5596,11 +5655,11 @@ img { max-width: 100%; display: block; }
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 14.5px;
+    font-size: 15.5px;
     font-weight: 700;
     color: #007AFF;
     text-decoration: none;
-    min-height: 44px;
+    min-height: 46px;
   }
   .prj-mobile-nav-bar {
     display: flex;
@@ -5610,8 +5669,8 @@ img { max-width: 100%; display: block; }
     margin-top: 18px;
   }
   .prj-mobile-arrow-btn {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: #FFFFFF;
     border: 1px solid #E2E8F0;
@@ -5627,8 +5686,8 @@ img { max-width: 100%; display: block; }
     gap: 6px;
   }
   .prj-mobile-nav-dot {
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: #CBD5E1;
     border: none;
@@ -5637,7 +5696,7 @@ img { max-width: 100%; display: block; }
     transition: all 0.25s ease;
   }
   .prj-mobile-nav-dot.is-active {
-    width: 18px;
+    width: 20px;
     border-radius: 999px;
     background: #007AFF;
   }
@@ -5647,12 +5706,14 @@ img { max-width: 100%; display: block; }
   }
   .prj-mobile-inquire-btn {
     width: 100%;
-    min-height: 48px;
+    min-height: 50px;
     justify-content: center;
     border-radius: 999px;
+    font-size: 15px;
+    font-weight: 700;
   }
 
-  /* ---- 6. Mobile Why Graphionic (Single Card with 01-04 tabs per requirement #6) ---- */
+  /* ---- 7. Mobile Why Graphionic (Single Card with 01-04 tabs per requirement #7) ---- */
   .why-mobile-container {
     margin-top: 24px;
     width: 100%;
@@ -5661,18 +5722,18 @@ img { max-width: 100%; display: block; }
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 22px;
   }
   .why-nav-tab {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 52px;
+    height: 50px;
+    border-radius: 14px;
     border: 1.5px solid #E2E8F0;
     background: #FFFFFF;
     color: var(--gray-500);
     font-weight: 800;
-    font-size: 14px;
+    font-size: 15px;
     display: grid;
     place-items: center;
     cursor: pointer;
@@ -5687,26 +5748,47 @@ img { max-width: 100%; display: block; }
     transform: translateY(-2px);
   }
   .why-mobile-stage {
-    width: 100%;
-    max-width: 410px;
+    width: calc(100% - 32px);
+    max-width: 440px;
     margin: 0 auto;
-    min-height: 270px;
+    min-height: 290px;
   }
   .why-mobile-card-slot {
     width: 100%;
   }
   .why-mobile-stage .why-card {
     min-height: auto;
-    padding: 24px 20px;
-    border-radius: 22px;
-    box-shadow: 0 14px 34px -12px rgba(10, 40, 90, 0.12);
+    padding: 26px 22px;
+    border-radius: 24px;
+    box-shadow: 0 16px 36px -12px rgba(10, 40, 90, 0.12);
+  }
+  .why-mobile-stage .why-card h3 {
+    font-size: 21px !important;
+    font-weight: 800 !important;
+  }
+  .why-mobile-stage .why-card p {
+    font-size: 15px !important;
+    line-height: 1.6 !important;
+  }
+  .why-cta .btn {
+    min-height: 50px !important;
+    font-size: 15px !important;
   }
 
-  /* ---- 7. Mobile Reviews (Summary Badge Only per requirement #7) ---- */
+  /* ---- 8. Mobile Reviews (Summary Badge Only per requirement #10) ---- */
   .rev-badge {
     margin: 24px auto 0 !important;
-    width: 100% !important;
-    max-width: 420px !important;
+    width: calc(100% - 32px) !important;
+    max-width: 440px !important;
+    padding: 26px 20px !important;
+    border-radius: 24px !important;
+  }
+  .rev-score strong {
+    font-size: 38px !important;
+    font-weight: 800 !important;
+  }
+  .rev-score p {
+    font-size: 14px !important;
   }
   .reviews-interactive-grid {
     display: none !important;
@@ -5714,11 +5796,17 @@ img { max-width: 100%; display: block; }
   .reviews-mobile-carousel {
     display: none !important;
   }
-  .rev-place {
-    margin-top: 24px !important;
+  .reviews .rev-place,
+  .reviews .rev-stats {
+    display: none !important;
+  }
+  .reviews .outline-btn {
+    min-height: 50px !important;
+    font-size: 15px !important;
+    margin-top: 20px !important;
   }
 
-  /* ---- 8. Mobile FAQ (Only one visible at a time with Next nav per requirement #8) ---- */
+  /* ---- 9. Mobile FAQ (Only one visible at a time with Next nav per requirement #8) ---- */
   .faq-layout {
     grid-template-columns: 1fr;
   }
@@ -5726,7 +5814,7 @@ img { max-width: 100%; display: block; }
     display: none;
   }
   .faq-mobile-single-view {
-    width: 100%;
+    width: calc(100% - 32px);
     max-width: 440px;
     margin: 24px auto 0;
   }
@@ -5737,8 +5825,8 @@ img { max-width: 100%; display: block; }
     gap: 12px;
   }
   .faq-prog-txt {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 700;
     color: var(--gray-500);
     letter-spacing: 0.04em;
     flex-shrink: 0;
@@ -5749,7 +5837,7 @@ img { max-width: 100%; display: block; }
   }
   .faq-prog-track {
     flex: 1;
-    height: 4px;
+    height: 6px;
     background: #E2EAF4;
     border-radius: 999px;
     overflow: hidden;
@@ -5767,9 +5855,9 @@ img { max-width: 100%; display: block; }
   .faq-mobile-card {
     background: #FFFFFF;
     border: 1px solid #E2EAF4;
-    border-radius: 22px;
-    padding: 22px 20px;
-    box-shadow: 0 12px 32px -10px rgba(10, 40, 90, 0.08);
+    border-radius: 24px;
+    padding: 24px 22px;
+    box-shadow: 0 14px 34px -10px rgba(10, 40, 90, 0.08);
   }
   .faq-mobile-card-header {
     display: flex;
@@ -5779,25 +5867,25 @@ img { max-width: 100%; display: block; }
   }
   .faq-mobile-card-header .faq-n {
     flex-shrink: 0;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 800;
     color: var(--blue);
     background: rgba(0, 122, 255, 0.09);
     border-radius: 8px;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     display: grid;
     place-items: center;
   }
   .faq-mobile-q-title {
-    font-size: 16.5px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--ink);
     line-height: 1.35;
     margin: 0;
   }
   .faq-mobile-card-body p {
-    font-size: 13.5px;
+    font-size: 15px;
     line-height: 1.6;
     color: var(--gray-600);
     margin: 0;
@@ -5809,13 +5897,13 @@ img { max-width: 100%; display: block; }
     margin-top: 18px;
   }
   .faq-mobile-prev-btn {
-    height: 46px;
-    padding: 0 18px;
+    height: 50px;
+    padding: 0 20px;
     border-radius: 999px;
     background: #FFFFFF;
     border: 1px solid #E2E8F0;
     color: var(--ink);
-    font-size: 13.5px;
+    font-size: 14.5px;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
@@ -5825,13 +5913,13 @@ img { max-width: 100%; display: block; }
   }
   .faq-mobile-next-btn {
     flex: 1;
-    height: 46px;
-    padding: 0 20px;
+    height: 50px;
+    padding: 0 22px;
     border-radius: 999px;
     background: var(--blue);
     color: #FFFFFF;
     border: none;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
@@ -5841,30 +5929,36 @@ img { max-width: 100%; display: block; }
     box-shadow: 0 6px 18px rgba(0, 122, 255, 0.3);
   }
 
-  /* ---- 9. Mobile Final CTA ---- */
+  /* ---- 10. Mobile Final CTA ---- */
   .cta {
-    padding: 36px 20px;
-    border-radius: 26px;
+    width: calc(100% - 32px) !important;
+    max-width: 440px !important;
+    margin: 32px auto 0 !important;
+    padding: 36px 24px !important;
+    border-radius: 26px !important;
   }
   .cta-left h2 {
-    font-size: clamp(24px, 7vw, 32px);
-    line-height: 1.2;
+    font-size: clamp(26px, 7.8vw, 34px) !important;
+    line-height: 1.2 !important;
   }
   .cta-btn {
-    width: 100%;
-    min-height: 48px;
-    justify-content: center;
+    width: 100% !important;
+    min-height: 52px !important;
+    font-size: 15.5px !important;
+    font-weight: 700 !important;
+    justify-content: center !important;
   }
   .cta-perks {
     grid-template-columns: 1fr;
     gap: 12px;
     margin-top: 24px;
+    font-size: 14.5px !important;
   }
   .cta-right {
     display: none !important;
   }
 
-  /* ---- 10. Mobile Footer (Navigation & Services columns removed per requirement #9) ---- */
+  /* ---- 11. Mobile Footer (Navigation & Services columns removed per requirement #19) ---- */
   .foot-col-nav,
   .foot-col-services {
     display: none !important;
@@ -5876,9 +5970,15 @@ img { max-width: 100%; display: block; }
   .foot-brand {
     text-align: left;
   }
+  .foot-blurb {
+    font-size: 15px !important;
+    line-height: 1.65 !important;
+  }
   .foot-cta {
     width: 100%;
-    min-height: 46px;
+    min-height: 52px;
+    font-size: 15px;
+    font-weight: 700;
     justify-content: center;
   }
 }

@@ -24,6 +24,7 @@ const HEADING_WORDS = [
 
 export default function About() {
   const sectionRef = useRef(null);
+  const stageRef = useRef(null);
   const headingRef = useRef(null);
 
   useEffect(() => {
@@ -83,9 +84,9 @@ export default function About() {
       // 2. Animos-style scroll-driven pinned word reveal across ALL 12 words
       if (words.length) {
         const isMobile = window.innerWidth <= 768;
-        const maxBlur = isMobile ? 6 : 9;
-        const baseY = isMobile ? 4 : 6;
-        const initialOpacity = 0.32;
+        const maxBlur = isMobile ? 8 : 9;
+        const baseY = isMobile ? 5 : 6;
+        const initialOpacity = 0.28;
 
         // Set initial blurred state for ALL words (0..11) from the very first word
         gsap.set(words, {
@@ -94,13 +95,15 @@ export default function About() {
           y: baseY,
         });
 
-        // Scrubbed timeline linked directly to the sticky scroll track progress
+        // Scrubbed timeline linked directly to the sticky scroll track progress with viewport pinning
         const revealTl = gsap.timeline({
           scrollTrigger: {
             trigger: el,
+            pin: stageRef.current,
             start: 'top top',
             end: 'bottom bottom',
             scrub: 0.5,
+            pinSpacing: false,
           },
         });
 
@@ -136,7 +139,7 @@ export default function About() {
 
   return (
     <section className="about about-track" id="about" ref={sectionRef}>
-      <div className="about-sticky-stage">
+      <div className="about-sticky-stage" ref={stageRef}>
         <div className="shell">
           <span className="eyebrow">
             <span className="dot" />
